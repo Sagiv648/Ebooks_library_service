@@ -3,8 +3,15 @@ import {Schema, model} from "mongoose";
 const schema = new Schema({
     email: String,
     password: String,
-    uploaded_books: Array,
-    uploaded_books_count: Number
+    uploaded_books: [{
+        type: Schema.Types.ObjectId,
+        ref: "book",
+        default: []
+    }],
+    uploaded_books_count: {
+        type: Number,
+        default: 0
+    }
 })
 
 const userModel = model("user", schema);

@@ -3,7 +3,8 @@ import { Schema,model } from "mongoose";
 const schema = new Schema({
     categories: [{
         type: Schema.Types.ObjectId,
-        ref: "category"
+        ref: "category",
+        
     }],
     user: {
         type: Schema.Types.ObjectId,
