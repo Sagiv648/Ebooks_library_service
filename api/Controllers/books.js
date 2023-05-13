@@ -7,42 +7,31 @@ const router = express.Router();
 
 router.get('/', async (req,res) => {
 
-    const {name, category} = req.query;
+    const {name, tags} = req.query;
     let query = {}
     if(name)
     {
         query.name = {$regex: name}
     }
-    if(category)
+    if(tags)
     {
-        query.categories = {$in: [category]};
+        query.tags = {$regex: tags};
     }
     
-    if(!query)
-    {
-        try {
-            const allBooks = await bookModel.find()
-            .populate({path: 'categories'})
-            .select('-__v')
-            return res.status(200).json(allBooks)
-        } 
-        catch (error) {
-            console.log(error.message);
-            return res.status(500).json({error: "server error"})
-        }
+    try {
+        const allBooks = await bookModel.find(query)
+        .populate({path: 'user', select: 'email avatar'})
+        
+        
+        
+        return res.status(200).json(allBooks)
+    } 
+    catch (error) {
+        console.log(error.message);
+        return res.status(500).json({error: "server error"})
     }
-    else
-    {
-        try {
-            const booksByQuery = await bookModel.find(query)
-            .populate({path: 'categories'})
-            .select('-__v')
-            return res.status(200).json(booksByQuery)
-        } catch (error) {
-            console.log(error.message);
-            return res.status(500).json({error: "server error"})
-        }
-    }
+
+    
     
 })
 
@@ -54,7 +43,7 @@ router.get('/:bookId', async (req,res) => {
 
     try {
         const bookById = await bookModel.findById(bookId)
-        .populate({path: 'categories'})
+        .populate({path: 'user', select: 'email avatar'})
         .select('-__v')
         return res.status(200).json({book: bookById})
     } 
@@ -65,7 +54,7 @@ router.get('/:bookId', async (req,res) => {
 })
 
 router.post('/', async (req,res) => {
-    const {categories, 
+    const {tags, 
         name,
         authors,
         description,
@@ -73,7 +62,7 @@ router.post('/', async (req,res) => {
         cover_image,
         download_url} = req.body;
         const {id} = req.data;
-        if(!categories || !name || !download_url)
+        if(!tags || !name || !download_url)
             return res.status(400).json({error: "invalid fields"})
 
         try {
@@ -82,7 +71,7 @@ router.post('/', async (req,res) => {
                 {
                     name: name,
                     authors: authors,
-                    categories: categories,
+                    tags: tags,
                     description: description,
                     publish_date: publish_date,
                     cover_image: cover_image,
@@ -99,13 +88,6 @@ router.post('/', async (req,res) => {
                 {$push: {uploaded_books: newBook},
                 $inc: {uploaded_books_count: 1}},{returnDocument: 'after'})
                 
-                .populate({path: "uploaded_books",
-                            populate: {
-                                path: 'categories'
-                            }})
-                .select('-__v')
-                .select('-password')
-
             if(!user)
                 return res.status(500).json({error: "server error"})
             

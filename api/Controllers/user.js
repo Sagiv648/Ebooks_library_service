@@ -87,14 +87,7 @@ router.get('/', auth, async (req,res) => {
         const details = await userModel.findById(id).
         select('-__v').
         select('-password')
-         .populate(
-            {
-                path: 'uploaded_books', 
-                populate: 
-                {
-                    path: 'categories'
-                },
-        })
+         .populate({path: 'uploaded_books', })
         
         if(details)
             return res.status(200).json(details)
