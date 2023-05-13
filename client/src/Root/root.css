@@ -30,4 +30,7 @@ body
     text-decoration: none;
     color: #2B2D42;
 }
-
+.avatar-img {
+    height: 50px;
+    width: 50px;
+}

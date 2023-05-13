@@ -22,7 +22,12 @@ router.post('/signup', async (req,res) => {
         },process.env.KEY);
         if(token)
         {
-            return res.status(201).json({token: token})
+            return res.status(201).json({profile: {
+                email: newUser.email,
+                avatar: newUser.avatar,
+                id: newUser._id,
+                uploaded_books: newUser.uploaded_books,
+                uploaded_books_count: newUser.uploaded_books_count},token: token})
         }
         else
             return res.status(500).json({error: "server error"})
@@ -40,14 +45,17 @@ router.post('/signup', async (req,res) => {
 router.post('/signin', async (req,res) => {
     
     const {email, password} = req.body;
-
+    
     if(!email || !password)
         return res.status(400).json({error: "invalid fields"})
 
     try {
         const exists = await userModel.findOne({email: email})
+        
+        
         if(!exists)
             return res.status(400).json({error: "invalid credentials"})
+            
         if(password != exists.password)
             return res.status(400).json({error: "invalid credentials"})
         const token = jwt.sign({
@@ -55,7 +63,13 @@ router.post('/signin', async (req,res) => {
         }, process.env.KEY)
         if(token)
         {
-            return res.status(200).json({token: token})
+            
+            return res.status(200).json({profile: {
+                email: exists.email,
+                avatar: exists.avatar,
+                id: exists._id,
+                uploaded_books: exists.uploaded_books,
+                uploaded_books_count: exists.uploaded_books_count},token: token})
         }
         else
             return res.status(500).json({error: "server error"})

@@ -2,53 +2,91 @@ import React, { useEffect, useState } from 'react'
 import Navbar from 'react-bootstrap/Navbar'
 import  Nav  from 'react-bootstrap/Nav'
 import Container from 'react-bootstrap/Container'
-import {Link, Outlet, useNavigate} from 'react-router-dom'
+import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom'
 import './root.css'
 import Row  from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import  NavDropdown  from 'react-bootstrap/NavDropdown'
+import NavDropdown  from 'react-bootstrap/NavDropdown'
 import HttpClient from '../api/HttpClient'
+import StorageClient from '../api/StorageClient'
+
 
 const Root = () => {
 
   const [collapsed, setCollapsed] = useState(false)
+  
   const [profile,setProfile] = useState(null)
-  const [connection,setConnection] = useState(null)
+  const [operationProgress, setOperationProgress] = useState(0)
+  const [operationProgressBar, setOperationProgressBar] = useState([])
   const nav = useNavigate();
+  const location = useLocation();
+  
   const logout = () => {
     HttpClient.SignOut();
   }
-  const fetchStorage = () => {
-    const item = localStorage.getItem("token")
-    
-    //console.log(item);
-    if(item)
-    {
-      console.log(item);
-      //const itemJson = JSON.parse(item);
-      HttpClient.SetToken(item)
-      setConnection(item)
-    }
-  }
 
-  HttpClient.SubscribeAuthState((token) => {
-    if(token)
-    {
-      setConnection(token)
-    }
-    else
-    {
-      setConnection(null)
-    }
-  })
+  
+  
+
+  const isAuthRoute = () => {
+    return location.pathname == '/signup' || location.pathname == '/signin'
+  }
+  const isProtectedRoute = () => {
+    return location.pathname == '/profile' || location.pathname == '/publish'
+  }
+  
   useEffect(() => {
-    fetchStorage();
-    console.log("it renderes atleast once yes?");
+    console.log("it renderes once no?");
+    HttpClient.FetchStorage((profile) => {
+      setProfile(profile);
+    })
+    HttpClient.SubscribeAuthState((profile) => {
+      if(profile)
+      {
+        setProfile(profile)
+        
+      }
+      else
+      {
+        setProfile(null)
+      }
+      })
+    StorageClient.SubscribeOperationsUpdates((x) => {
+      if(x == -1)
+      {
+        setOperationProgressBar([])
+        setOperationProgress(-1)
+      }
+      else
+      {
+        setOperationProgressBar([...operationProgressBar,operationProgress])
+        setOperationProgress(x)
+      }
+      
+    })
+    
+    
+   
     return () => {
       
     }
   },[])
 
+  useEffect(() => {
+    
+
+
+    if(isAuthRoute() && HttpClient.isAuth())
+    {
+      nav('/', {replace: true})
+    }
+    else if(isProtectedRoute() && !HttpClient.isAuth())
+    {
+      nav('/signin', {replace: true})
+    }
+
+    
+  },[location])
   return (
     <>
     <Navbar className='navbar-header' bg='light' expand="lg" onToggle={() => {
@@ -64,7 +102,7 @@ const Root = () => {
           <Navbar.Toggle aria-controls='basic-navbar-nav'/>
           <Navbar.Collapse style={collapsed ? {backgroundColor: '#E9F7CA'}  :{} } id='basic-navbar-nav'>
           {
-            connection ? (
+            profile ? (
               <Nav className='me-auto'>
             
               <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
@@ -82,7 +120,7 @@ const Root = () => {
             
               <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
               <Nav.Item> <Link className='nav-item' to ={'books'}>Books</Link></Nav.Item>
-              <Nav.Item> <Link className='nav-item' to={"publish"}>Publish a book</Link></Nav.Item>
+              <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
               <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
               <Nav.Item> <Link className='nav-item' to={"signin"}>Sign in</Link></Nav.Item>
               <Nav.Item><Link className='nav-item' to={"signup"}>Sign up</Link></Nav.Item>
@@ -90,47 +128,25 @@ const Root = () => {
             )
           }
           {
-            connection && <Navbar.Brand>Test</Navbar.Brand>
+            profile ? <Navbar.Brand>{profile.email}</Navbar.Brand> : <Navbar.Brand>Guest</Navbar.Brand>
           }
+          {profile && <Navbar.Brand><img className='avatar-img' src={profile.avatar ? profile.avatar : "../user.png"}/></Navbar.Brand>}
           
           </Navbar.Collapse>
+          
+             
           
           
           
       </Container>
-
+      {
+        operationProgressBar.length > 0 && (<Navbar.Brand>{operationProgress}</Navbar.Brand>)
+      }
+          
     </Navbar>
     <Outlet/>
     </>
     
-  )
-
-  return (
-    <>
-      <Navbar bg="light" expand="lg">
-      <Container>
-        <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#link">Link</Nav.Link>
-            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
-              </NavDropdown.Item>
-            </NavDropdown>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-    </>
   )
 
 }

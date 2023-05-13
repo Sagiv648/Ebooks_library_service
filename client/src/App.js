@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { authenticateThunk, populate } from './features/auth/authSlice';
 import HttpClient from './api/HttpClient';
+import StorageClient from './api/StorageClient';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -84,21 +85,6 @@ function App() {
   
   //console.log(connected);
   //console.log(auth);
-
-  HttpClient.SubscribeAuthState((token) => {
-    if(token)
-    {
-      setConnected(token)
-      //setRenderRouter(router)
-    }
-    else
-    {
-      setConnected(null);
-      //setRenderRouter(authRouter)
-    }
-    
-  })
-  
 
   return (
     <RouterProvider router={authRouter}/>

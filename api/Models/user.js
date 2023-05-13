@@ -11,6 +11,10 @@ const schema = new Schema({
     uploaded_books_count: {
         type: Number,
         default: 0
+    },
+    avatar: {
+        type: String,
+        default: ""
     }
 })
 

@@ -2,9 +2,15 @@ import React from 'react'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/esm/Col'
+import { useNavigation } from 'react-router-dom'
 //background color #9DA2AB
 
 const Home = () => {
+
+  const nav = useNavigation();
+
+  console.log(nav.state);
+
   return (
     <Container fluid>
 
