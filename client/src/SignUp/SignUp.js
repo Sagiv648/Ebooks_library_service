@@ -143,7 +143,7 @@ function RegisterForm() {
     if (form.checkValidity() === false) {
       event.stopPropagation();
     } else {
-      // TODO: handle form submission
+      
     }
     setValidated(true);
   };

@@ -65,6 +65,12 @@ class HttpClient{
             return error;
         }
     }
+    static GetProfile() {
+        const item = localStorage.getItem("profile")
+        if(item)
+            return JSON.parse(item)
+        return item;
+    }
     static FetchStorage(cb) {
         const item = localStorage.getItem("token")
         const profile = localStorage.getItem("profile")
