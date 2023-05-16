@@ -106,8 +106,8 @@ const Root = () => {
               <Nav className='me-auto'>
             
               <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
-              <Nav.Item> <Link className='nav-item' to ={'books'}>Books</Link></Nav.Item>
-              <Nav.Item> <Link className='nav-item' to={"publish"}>Publish a book</Link></Nav.Item>
+              {/* <Nav.Item> <Link className='nav-item' to ={'books'}>Books</Link></Nav.Item> */}
+              <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
               {/* <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item> */}
               <Nav.Item onClick={() => {
                 logout();
@@ -119,7 +119,7 @@ const Root = () => {
               <Nav className='me-auto'>
             
               <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
-              <Nav.Item> <Link className='nav-item' to ={'books'}>Books</Link></Nav.Item>
+              {/* <Nav.Item> <Link className='nav-item' to ={'books'}>Books</Link></Nav.Item> */}
               <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
               {/* <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item> */}
               <Nav.Item> <Link className='nav-item' to={"signin"}>Sign in</Link></Nav.Item>
