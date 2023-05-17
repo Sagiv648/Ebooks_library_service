@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
@@ -7,20 +7,22 @@ import FormControl from 'react-bootstrap/FormControl'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import crypt from 'crypto-js'
-
+import FormGroup from 'react-bootstrap/esm/FormGroup';
 import Alert from 'react-bootstrap/Alert'
 import Toast from 'react-bootstrap/Toast'
 import ToastContainer from 'react-bootstrap/ToastContainer'
 import { useNavigate } from 'react-router-dom';
 import HttpClient from '../api/HttpClient';
-const SignUp = () => {
+const SignUp = (props) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [passwordShwon, setPasswordShown] = useState(false)
   const [toastDisplay, setToastDisplay] = useState(false)
   const [error, setError] = useState("")
-  const navigator = useNavigate()
 
+  const navigator = useNavigate()
+  const viewSetter = props.viewSetter;
+  const emailSentSetter = props.emailSentSetter
   const lengthValidation = (email,password) => {
     return email != "" && password != ""
   }
@@ -31,7 +33,7 @@ const SignUp = () => {
     return emailSplit.length == 2
   }
   const passwordValidation = (password) => {
-    return password.length >= 9
+    return password.length >= 5
   }
 
   const signup = async () => {
@@ -51,21 +53,25 @@ const SignUp = () => {
 
     else if(!passwordValidation(password))
     {
-      setError("Password must contain atleast 9 characters.")
+      setError("Password must contain atleast 5 characters.")
       setToastDisplay(true)
       return;
       
     }
     const hashed = crypt.SHA256(password).toString();
     const res = await HttpClient.SignUp({email: email, password: hashed})
+    console.log(res.message);
     if(res instanceof Error)
     {
+      
       setError(res.message)
       setToastDisplay(true)
     }
     else
     {
-      navigator('/')
+      viewSetter('login')
+      alert("A verification email was sent to you.")
+      
     }    
   
 
@@ -83,8 +89,13 @@ const SignUp = () => {
       </ToastContainer>
       
       <Container style={{minHeight: '95vh', alignItems: 'center',display: 'flex', justifyContent: 'center',width: 'auto', paddingBottom: 10}} fluid>
+
+        
       <Form style={{marginTop: -200,backgroundColor: 'gray', padding: 50, borderRadius: 25, borderStyle: 'outset'}}>
-        <Row > 
+        <img src='../logo.png'/>
+        
+        <Row>
+        <Col > 
           <Form.Group >
             <Form.Label style={{fontSize: 'large'}}>Email address:</Form.Label>
             <FormControl onChange={(e) => {
@@ -93,29 +104,38 @@ const SignUp = () => {
             }} value={email} type='email' placeholder='Email...'/>
           
         </Form.Group>
-        </Row>
-        <Row style={{marginTop: 50}}>
+        </Col>
+        <Col >
           <Form.Group>
             
             <Form.Label style={{fontSize: 'large'}}>Password</Form.Label>
-            <Form.Check 
+            <FormControl onChange={(e) => {
+              setPassword(e.target.value)
+            }} value={password} type={passwordShwon ? "text" : "password"} placeholder='Password...'/>
+          
+        </Form.Group>
+        <Form.Check 
             label="Display password"
             type='checkbox'
             onChange={(e) => {
               
               setPasswordShown(!passwordShwon)
             }}/>
-            <FormControl onChange={(e) => {
-              setPassword(e.target.value)
-            }} value={password} type={passwordShwon ? "text" : "password"} placeholder='Password...'/>
-          
-        </Form.Group>
+        </Col>
+        
         </Row>
+        
+        
         <Row style={{marginTop: 50}}><Button onClick={async () => {
 
           await signup();
 
         }} size='lg'>Sign up</Button></Row>
+         <Row style={{marginTop: 50}}><Button onClick={async () => {
+
+          viewSetter("login")
+
+}} size='lg'>Sign in</Button></Row>
       </Form>
     </Container>
     </Container>

@@ -9,12 +9,13 @@ import Toast from 'react-bootstrap/Toast'
 import ToastContainer from 'react-bootstrap/ToastContainer'
 import { useNavigate } from 'react-router-dom';
 import HttpClient from '../api/HttpClient';
-const SignIn = () => {
+const SignIn = (props) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [passwordShwon, setPasswordShown] = useState(false)
   const [toastDisplay, setToastDisplay] = useState(false)
   const [error, setError] = useState("")
+  const viewSetter = props.viewSetter;
   const navigator = useNavigate()
 
   const lengthValidation = (email,password) => {
@@ -27,7 +28,7 @@ const SignIn = () => {
     return emailSplit.length == 2
   }
   const passwordValidation = (password) => {
-    return password.length >= 9
+    return password.length >= 5
   }
 
   const signin = async () => {
@@ -80,7 +81,8 @@ const SignIn = () => {
       </ToastContainer>
       
       <Container style={{minHeight: '95vh', alignItems: 'center',display: 'flex', justifyContent: 'center',width: 'auto', paddingBottom: 10}} fluid>
-      <Form style={{marginTop: -200,backgroundColor: '#98B9AB', padding: 50, borderRadius: 25, borderStyle: 'outset'}}>
+      <Form style={{marginTop: -50,backgroundColor: '#98B9AB', padding: 50, borderRadius: 25, borderStyle: 'outset'}}>
+      <img src='../logo.png'/>
         <Row > 
           <Form.Group >
             <Form.Label style={{fontSize: 'large'}}>Email address:</Form.Label>
@@ -113,6 +115,16 @@ const SignIn = () => {
           await signin();
 
         }} size='lg'>Sign in</Button></Row>
+        <Row style={{marginTop: 50}}><Button onClick={async () => {
+
+
+          viewSetter("register")
+      }} size='lg'>Sign up</Button></Row>
+      <Row style={{marginTop: 50}}><Button onClick={async () => {
+
+
+      viewSetter("passwordReset")
+      }} size='lg'>Reset password</Button></Row>
       </Form>
     </Container>
     </Container>

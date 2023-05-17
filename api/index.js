@@ -7,13 +7,20 @@ import bodyParser from "body-parser";
 import userRouter from "./Controllers/user.js";
 import cors from 'cors'
 import booksRouter from "./Controllers/books.js";
-import { auth } from "./Controllers/auth.js";
+import { auth, emailTokenAuth } from "./Controllers/auth.js";
+import categoryRouter from "./Controllers/categories.js";
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cors())
 
 app.use('/api/user', userRouter)
+
+
+
+
 app.use('/api/books',auth, booksRouter)
+app.use('/api/categories',auth, categoryRouter);
 
 app.use((req,res) => {
     

@@ -1,7 +1,10 @@
 import { Schema,model } from "mongoose";
 
 const schema = new Schema({
-    tags: String,
+    category: {
+        type: Schema.Types.ObjectId,
+        ref: "category"
+    },
     user: {
         type: Schema.Types.ObjectId,
         ref: "user"

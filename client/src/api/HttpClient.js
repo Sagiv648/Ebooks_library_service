@@ -11,34 +11,36 @@ class HttpClient{
     validateStatus : (code) => code >= 200
     })
 
-    static #protectedApi = axios.create(
-        {
-    baseURL: "http://localhost:80/api", 
-    headers: {
-        authorization: this.#token
-    },
-    validateStatus : (code) => code >= 200
-       
-    
-    })
+   
     static SubscribeAuthState(cb)
     {
         this.#authStateSubscribers.push(cb);
+    }
+    static #GetToken() {
+        const item = localStorage.getItem("token")
+        return item;
+    }
+    static async GetCategories() {
+
+        try {
+            const token = this.#GetToken();
+            const res = await this.#api.get('/categories/', {headers: 
+                { authorization: `Bearer ${token}` }})
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            return res.data;
+        } catch (error) {
+            return error;
+        }
     }
     static async SignUp(data)
     {
         try {
             const res = await this.#api.post("/user/signup", data)
-            if(res.status != 201)
+            if(res.status != 200)
                 throw new Error(res.data.error)
 
-            this.#token = res.data.token;
-            localStorage.setItem("token", this.#token)
-            localStorage.setItem("profile", JSON.stringify( res.data.profile))
-
-
-            this.#authStateSubscribers.forEach((cb) => cb(res.data.profile))
-            return res.data.profile;
+            return res.data;
             
         } catch (error) {
             return error;
@@ -112,5 +114,18 @@ class HttpClient{
         })
     }
     
+    static async RequestResetPassword(email) {
+
+        try {
+            const res = await this.#api.post('/user/reset', email)
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+
+            localStorage.setItem("reset_verification", JSON.stringify(res.data));
+            return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
 }
 export default HttpClient

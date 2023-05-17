@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get('/', async (req,res) => {
 
-    const {name, tags} = req.query;
+    const {name, category} = req.query;
     let query = {}
     if(name)
     {
@@ -15,16 +15,17 @@ router.get('/', async (req,res) => {
     }
     if(tags)
     {
-        query.tags = {$regex: tags};
+        query.category = category;
     }
     
     try {
-        const allBooks = await bookModel.find(query)
+        const allBooksByQuery = await bookModel.find(query)
         .populate({path: 'user', select: 'email avatar'})
+        .populate({path: 'category'})
         
         
         
-        return res.status(200).json(allBooks)
+        return res.status(200).json(allBooksByQuery)
     } 
     catch (error) {
         console.log(error.message);
@@ -44,6 +45,7 @@ router.get('/:bookId', async (req,res) => {
     try {
         const bookById = await bookModel.findById(bookId)
         .populate({path: 'user', select: 'email avatar'})
+        .populate({path: 'category'})
         .select('-__v')
         return res.status(200).json({book: bookById})
     } 
@@ -54,7 +56,7 @@ router.get('/:bookId', async (req,res) => {
 })
 
 router.post('/', async (req,res) => {
-    const {tags, 
+    const {category, 
         name,
         authors,
         description,
@@ -62,7 +64,7 @@ router.post('/', async (req,res) => {
         cover_image,
         download_url} = req.body;
         const {id} = req.data;
-        if(!tags || !name || !download_url)
+        if(!category || !name || !download_url)
             return res.status(400).json({error: "invalid fields"})
 
         try {
@@ -71,7 +73,7 @@ router.post('/', async (req,res) => {
                 {
                     name: name,
                     authors: authors,
-                    tags: tags,
+                    category: category,
                     description: description,
                     publish_date: publish_date,
                     cover_image: cover_image,
@@ -88,12 +90,13 @@ router.post('/', async (req,res) => {
                 {$push: {uploaded_books: newBook},
                 $inc: {uploaded_books_count: 1}},{returnDocument: 'after'})
                 
+                
             if(!user)
                 return res.status(500).json({error: "server error"})
             
             
-
-            return res.status(201).json({book: newBook})
+            const bookToReturn = newBook.populate({path: 'category'})
+            return res.status(201).json({book: bookToReturn})
             
         } 
         catch (error) {
