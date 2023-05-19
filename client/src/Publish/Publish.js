@@ -22,6 +22,7 @@ const Publish = () => {
   const filePickerRef = useRef(null)
   const [categories,setCategories] = useState([])
   const [selectedCategory, setSelectedCategory] = useState("Select a category")
+  
   const fetchCategories = async () => {
     const cats = await HttpClient.GetCategories();
     if(cats instanceof Error)
@@ -31,7 +32,8 @@ const Publish = () => {
   }
 
   useEffect(() => {
-    fetchCategories();
+    if(HttpClient.isAuth())
+      fetchCategories();
   },[])
 
 

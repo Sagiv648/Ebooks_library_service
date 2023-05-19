@@ -9,6 +9,9 @@ import Col from 'react-bootstrap/Col'
 import NavDropdown  from 'react-bootstrap/NavDropdown'
 import HttpClient from '../api/HttpClient'
 import StorageClient from '../api/StorageClient'
+import Loader from '../components/Loader'
+
+
 
 
 const Root = () => {
@@ -29,10 +32,10 @@ const Root = () => {
   
 
   const isAuthRoute = () => {
-    return location.pathname == '/signup' || location.pathname == '/signin'
+    return location.pathname === '/auth'
   }
   const isProtectedRoute = () => {
-    return location.pathname == '/profile' || location.pathname == '/publish'
+    return location.pathname === '/publish' || location.pathname === '/profile'
   }
   
   useEffect(() => {
@@ -72,21 +75,33 @@ const Root = () => {
     }
   },[])
 
+  
+
   useEffect(() => {
     
 
-
     if(isAuthRoute() && HttpClient.isAuth())
     {
+      
       nav('/', {replace: true})
+      
     }
     else if(isProtectedRoute() && !HttpClient.isAuth())
     {
-      nav('/signin', {replace: true})
+      
+      nav('/auth', {replace: true, })
+      
     }
+    
 
     
+   
+    
   },[location])
+
+  
+  
+
   return (
     <>
     <Navbar className='navbar-header' bg='light' expand="lg" onToggle={() => {
@@ -129,7 +144,10 @@ const Root = () => {
           {
             profile ? <Navbar.Brand>{profile.email}</Navbar.Brand> : <Navbar.Brand>Guest</Navbar.Brand>
           }
-          {profile && <Navbar.Brand><img className='avatar-img' src={profile.avatar ? profile.avatar : "../user.png"}/></Navbar.Brand>}
+          {profile && <Navbar.Brand onClick={() => {
+              //setAvatarClicked(!avatarClicked)
+
+          }}><img className='avatar-img' src={profile.avatar ? profile.avatar : "../user.png"}/></Navbar.Brand>}
           
           </Navbar.Collapse>
           
@@ -143,7 +161,12 @@ const Root = () => {
       }
           
     </Navbar>
-    <Outlet/>
+      
+        <Outlet/>
+      
+      
+    
+    
     </>
     
   )

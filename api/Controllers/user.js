@@ -123,9 +123,9 @@ router.post('/reset', async (req,res) => {
     if(!email)
         return res.status(400).json({error: "invalid fields"})
     try {
-        const generated_code = randomInt(0,100000).toString();
+        const generated_code = randomInt(100000,999999).toString();
         console.log(generated_code);
-        const verificationPayload = jwt.sign({code: generated_code}, generated_code,{expiresIn: '15m'})
+        const verificationPayload = jwt.sign({code: generated_code, email: email}, generated_code,{expiresIn: '15m'})
         const result = await transport.sendMail({
             from: process.env.EMAIL_SENDER,
             to: email,
@@ -142,9 +142,39 @@ router.post('/reset', async (req,res) => {
     }
 })
 
-router.get('/reset/:payload', )
+router.get('/reset/:payload', async (req,res) => {
+    
+
+})
 
 
+router.put('/:payload', async (req,res) => {
+    const {payload} = req.params;
+    console.log(payload);
+    const {code,email,password} = req.body;
+    console.log(req.body);
+    if(!payload || !code || !email || !password)
+        return res.status(400).json({error: "invalid fields"})
+
+    try {
+        jwt.verify(payload, code, async (err,payload) => {
+            if(err)
+                return res.status(401).json({error: "unauthorized"})
+            
+            else
+            {
+                const updated = await userModel.findOneAndUpdate({email: email}, {password: password}, {returnDocument: 'after'})
+                if(updated)
+                    return res.status(200).json({
+                        updated: true
+                    })
+                return res.status(400).json({error: "no user with such email"})
+            }
+        })
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
+    }
+})
 
 router.get('/', auth, async (req,res) => {
 

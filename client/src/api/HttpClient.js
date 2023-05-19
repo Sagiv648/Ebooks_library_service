@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import {decodeToken, isExpired} from 'react-jwt'
 
 class HttpClient{
 
@@ -21,7 +21,7 @@ class HttpClient{
         return item;
     }
     static async GetCategories() {
-
+        
         try {
             const token = this.#GetToken();
             const res = await this.#api.get('/categories/', {headers: 
@@ -55,6 +55,7 @@ class HttpClient{
                 throw new Error(res.data.error)
             console.log(res.data);
             this.#token = res.data.token;
+            localStorage.removeItem("confirmed")
             localStorage.setItem("token", this.#token)
             localStorage.setItem("profile", JSON.stringify( res.data.profile))
             
@@ -69,6 +70,7 @@ class HttpClient{
     }
     static GetProfile() {
         const item = localStorage.getItem("profile")
+        console.log(item);
         if(item)
             return JSON.parse(item)
         return item;
@@ -97,7 +99,9 @@ class HttpClient{
     }
     static isAuth()
     {
-        return this.#token != null
+        const item = localStorage.getItem("token")
+        console.log(item);
+        return item != null;
     }
     static GetToken()
     {
@@ -117,12 +121,51 @@ class HttpClient{
     static async RequestResetPassword(email) {
 
         try {
-            const res = await this.#api.post('/user/reset', email)
+            const res = await this.#api.post('/user/reset', {email: email})
             if(res.status !== 200)
                 throw new Error(res.data.error)
 
             localStorage.setItem("reset_verification", JSON.stringify(res.data));
             return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
+
+    static CompareCodes(code)
+    {
+        try {
+            const item = localStorage.getItem("reset_verification")
+            if(item == null || isExpired(item))
+                throw new Error("invalid code")
+            const decoded = decodeToken(item);
+            
+            console.log(`inputted: ${code} --- code: ${decoded.code}`);
+            if(decoded.code === code)
+            {
+                localStorage.removeItem("reset_verification")
+                localStorage.setItem("confirmed", JSON.stringify({email: decoded.email,code: code, 
+                    change_token: JSON.parse(item).code_verification}))
+                return code;
+            }
+                
+            throw new Error("invalid code")
+        } catch (error) {
+            return error;
+        }
+        
+    }
+    static async SetPassword(password) {
+
+        try {
+            const item = JSON.parse(localStorage.getItem("confirmed"))
+            if(item == null)
+                throw new Error("invalid fields")
+            console.log(item);
+            
+            const res = await this.#api.put(`/user/${item.change_token}`, {email: item.email, password: password, code: item.code})
+            if(res.status !== 200)
+                throw new Error(res.data.error)
         } catch (error) {
             return error;
         }
