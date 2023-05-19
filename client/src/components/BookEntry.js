@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Accordion from 'react-bootstrap/Accordion'
 import Container from 'react-bootstrap/esm/Container'
-const UploadedBookEntry = (props) => {
+const BookEntry = (props) => {
     const [book, setBook] = useState(props.book)
     
  
@@ -13,4 +13,4 @@ const UploadedBookEntry = (props) => {
   )
 }
 
-export default UploadedBookEntry
+export default BookEntry

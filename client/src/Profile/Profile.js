@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/esm/Button'
 import HttpClient from '../api/HttpClient'
 import Col from 'react-bootstrap/esm/Col'
 import Accordion from 'react-bootstrap/Accordion'
-import UploadedBookEntry from './UploadedBookEntry'
+import BookEntry from '../components/BookEntry'
 //TODO: Profile
 const Profile = () => {
   
@@ -18,24 +18,47 @@ const Profile = () => {
   const inputCoverRef = useRef();
   const [uploadedBooksCount, setUploadedBooksCount] = useState(0)
   const [uploadedBooks, setUploadedBooks] = useState([])
+
+  const fetchBooks = async() => {
+    if(!profile)
+      return;
+    
+    const res = await HttpClient.GetUserBooks();
+
+    if(res instanceof Error)
+    {
+      alert(res.message)
+    }
+    else
+    {
+      setUploadedBooks(res.uploaded_books)
+      setUploadedBooksCount(res.uploaded_books_count)
+    }
+      
+    
+
+    
+  }
+
   const fetchProfile = () => {
     const profile = HttpClient.GetProfile();
     if(profile)
     {
       setProfile(profile)
       setAvatar(profile.avatar)
-      setUploadedBooks(profile.uploaded_books)
-      setUploadedBooksCount(profile.uploaded_books_count)
-    }
       
-    else
-      console.log("do smth");
+    }
+
   }
   useEffect(() => {
     
     fetchProfile();
+    fetchBooks();
   },[])
+
+
 //TODO: Fetch the user's uploaded books
+//TODO: Implement pagination
   return (
     
       <Container style={{backgroundColor: 'AppWorkspace',marginTop: 20,width: '80%',borderRadius: 25, borderStyle: 'outset',borderWidth: 1}} fluid>
@@ -48,7 +71,7 @@ const Profile = () => {
                 {uploadedBooks.length > 0 ? uploadedBooks.map((val,ind) => {
 
                   return (<Accordion.Item key={ind} eventKey={ind+1}>
-                    <UploadedBookEntry book={val}/>
+                    <BookEntry book={val}/>
                   </Accordion.Item>)
                 })
                 :

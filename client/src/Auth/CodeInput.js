@@ -21,7 +21,6 @@ const CodeInput = (props) => {
     return colsArr
   }
 
-
  
 
   const handleCodeInput = () => {
@@ -46,6 +45,7 @@ const CodeInput = (props) => {
               generateColsArr().map((val,ind) => {
                 return (
                   <FormControl
+                  
                   onChange={(e) => {
                     if(code.length < ind)
                       setCode([...code,e.target.value])

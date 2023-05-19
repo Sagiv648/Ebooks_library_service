@@ -170,5 +170,26 @@ class HttpClient{
             return error;
         }
     }
+    static async GetUserBooks()
+    {
+        try {
+            const token = this.#GetToken();
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.get('/user/books', 
+            {
+                headers:
+                {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            console.log(res.data);
+            return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
 }
 export default HttpClient

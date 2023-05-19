@@ -10,6 +10,7 @@ import { randomBytes, randomInt } from 'crypto';
 dotenv.config();
 const router = express.Router();
 
+//Password is hashed in the client
 router.post('/signup', async (req,res) => {
 
     const {email, password} = req.body;
@@ -52,6 +53,7 @@ router.post('/signup', async (req,res) => {
 
 })
 
+//Password is hashed in the client
 router.post('/signin', async (req,res) => {
     
     const {email, password} = req.body;
@@ -176,14 +178,14 @@ router.put('/:payload', async (req,res) => {
     }
 })
 
-router.get('/', auth, async (req,res) => {
+router.get('/books', auth, async (req,res) => {
 
     const {id} = req.data;
     try {
-        const details = await userModel.findById(id).
-        select('-__v').
-        select('-password')
+        const details = await userModel.findById(id)
          .populate({path: 'uploaded_books', })
+         .select('uploaded_books')
+         .select("uploaded_books_count")
         
         if(details)
             return res.status(200).json(details)
