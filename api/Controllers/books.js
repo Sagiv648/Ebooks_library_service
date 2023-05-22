@@ -95,11 +95,13 @@ router.post('/', async (req,res) => {
                 return res.status(500).json({error: "server error"})
             
             
-            const bookToReturn = newBook.populate({path: 'category'})
+            const bookToReturn = await newBook.populate({path: 'category'})
+            console.log(bookToReturn);
             return res.status(201).json({book: bookToReturn})
             
         } 
         catch (error) {
+            throw error
             return res.status(500).json({error: "server error"})
         }
         

@@ -70,7 +70,7 @@ class HttpClient{
     }
     static GetProfile() {
         const item = localStorage.getItem("profile")
-        console.log(item);
+        
         if(item)
             return JSON.parse(item)
         return item;
@@ -100,7 +100,7 @@ class HttpClient{
     static isAuth()
     {
         const item = localStorage.getItem("token")
-        console.log(item);
+        
         return item != null;
     }
     static GetToken()
@@ -185,8 +185,40 @@ class HttpClient{
             })
             if(res.status !== 200)
                 throw new Error(res.data.error)
-            console.log(res.data);
+            
             return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
+    static async UploadBook(data)
+    {
+        try {
+            const token = this.#GetToken();
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.post('/books/', {download_url: data.file, 
+                cover_image: data.cover,
+                description: data.description,
+                authors: data.authors,
+                name: data.name,
+                category: data.category,
+                publish_date: data.publishDate}, 
+                {headers: {
+                authorization: `Bearer ${token}`
+            }})
+            if(res.status !== 201)
+                throw new Error(res.data.error)
+            const localProfile = localStorage.getItem("profile")
+            const parsedProfile = JSON.parse(localProfile)
+            console.log("data is");
+            console.log(res.data);
+            parsedProfile.uploaded_books.push(res.data.book._id)
+            parsedProfile.uploaded_books_count++;
+            localStorage.setItem("profile", JSON.stringify(parsedProfile))
+            
+            return res.data.book;
+            
         } catch (error) {
             return error;
         }

@@ -19,26 +19,7 @@ const Profile = () => {
   const [uploadedBooksCount, setUploadedBooksCount] = useState(0)
   const [uploadedBooks, setUploadedBooks] = useState([])
 
-  const fetchBooks = async() => {
-    if(!profile)
-      return;
-    
-    const res = await HttpClient.GetUserBooks();
-
-    if(res instanceof Error)
-    {
-      alert(res.message)
-    }
-    else
-    {
-      setUploadedBooks(res.uploaded_books)
-      setUploadedBooksCount(res.uploaded_books_count)
-    }
-      
-    
-
-    
-  }
+  
 
   const fetchProfile = () => {
     const profile = HttpClient.GetProfile();
@@ -50,10 +31,33 @@ const Profile = () => {
     }
 
   }
+  const fetchBooks = async() => {
+    
+    const res = await HttpClient.GetUserBooks();
+    
+    if(res instanceof Error)
+    {
+      alert(res.message)
+    }
+    else
+    {
+      console.log(res);
+      setUploadedBooks(res.uploaded_books)
+      setUploadedBooksCount(res.uploaded_books_count)
+    }
+      
+    
+
+    
+  }
   useEffect(() => {
     
-    fetchProfile();
     fetchBooks();
+    fetchProfile();
+    
+
+    
+    
   },[])
 
 

@@ -10,7 +10,8 @@ import NavDropdown  from 'react-bootstrap/NavDropdown'
 import HttpClient from '../api/HttpClient'
 import StorageClient from '../api/StorageClient'
 import Loader from '../components/Loader'
-
+import {toast, ToastContainer} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -19,11 +20,11 @@ const Root = () => {
   const [collapsed, setCollapsed] = useState(false)
   
   const [profile,setProfile] = useState(null)
-  const [operationProgress, setOperationProgress] = useState(0)
-  const [operationProgressBar, setOperationProgressBar] = useState([])
+ 
+  const [uploads, setUploads] = useState([])
   const nav = useNavigate();
   const location = useLocation();
-  
+
   const logout = () => {
     HttpClient.SignOut();
   }
@@ -54,24 +55,22 @@ const Root = () => {
         setProfile(null)
       }
       })
-    StorageClient.SubscribeOperationsUpdates((x) => {
-      if(x == -1)
-      {
-        setOperationProgressBar([])
-        setOperationProgress(-1)
-      }
-      else
-      {
-        setOperationProgressBar([...operationProgressBar,operationProgress])
-        setOperationProgress(x)
-      }
-      
+      StorageClient.SubscribeForUploadEnd((data) => {
+        console.log(data);
+        toast.success(`Book ${data.name} has been successfully uploaded`)
+        //setUploads(uploads.filter((val,ind) => ind != index))
+      })
+      StorageClient.SubscribeForUploadStart((data) => {
+        toast.info(`Book ${data.name} has began it's upload`)
+        setUploads([...uploads, {...data, finished: false}])
+      })
+    StorageClient.SubscribeForProgress((data) => {
+      //toast.info(`Progress on ${data.name}\n${data.progress}`)
     })
-    
-    
    
     return () => {
-      
+      StorageClient.RemoveSubscriptions();
+      console.log("un rendered");
     }
   },[])
 
@@ -124,6 +123,16 @@ const Root = () => {
               
               <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
               <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
+              {/* <Nav.Item>
+                <Link className='nav-item' to={'uploads'}>Uploads</Link>
+                {
+                  uploads.filter((upload) => upload.finished == false).length > 0 &&
+                  (<Container style={{borderWidth: 1,backgroundColor: '#2596be', width: 50,textAlign: 'center',  borderRadius: 20, borderStyle: 'outset'}}>
+                    {uploads.filter((upload) => upload.finished == false).length}
+                  </Container>)
+                }
+              
+              </Nav.Item> */}
               <Nav.Item onClick={() => {
                 logout();
                 
@@ -144,6 +153,7 @@ const Root = () => {
           {
             profile ? <Navbar.Brand>{profile.email}</Navbar.Brand> : <Navbar.Brand>Guest</Navbar.Brand>
           }
+          
           {profile && <Navbar.Brand onClick={() => {
               //setAvatarClicked(!avatarClicked)
 
@@ -152,17 +162,17 @@ const Root = () => {
           </Navbar.Collapse>
           
              
+        {/* {
+        operationProgress && (<Navbar.Brand>{operationProgress}</Navbar.Brand>)
+        } */}
           
-          
-          
+          <ToastContainer/>
       </Container>
-      {
-        operationProgressBar.length > 0 && (<Navbar.Brand>{operationProgress}</Navbar.Brand>)
-      }
+      
           
     </Navbar>
       
-        <Outlet/>
+        <Outlet context={[]}/>
       
       
     

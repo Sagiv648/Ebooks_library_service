@@ -9,6 +9,7 @@ import { createBrowserRouter, RouterProvider, useNavigate } from 'react-router-d
 import Publish from './Publish/Publish';
 import Profile from './Profile/Profile';
 import Auth from './Auth/Auth';
+import Uploads from './Uploads/Uploads';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
         path: 'auth',
         element: <Auth/>
       },
+      {
+        path: 'uploads',
+        element: <Uploads/>
+      }
       
     
       
