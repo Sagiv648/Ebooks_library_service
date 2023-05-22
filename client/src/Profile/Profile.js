@@ -35,16 +35,13 @@ const Profile = () => {
     
     const res = await HttpClient.GetUserBooks();
     
-    if(res instanceof Error)
-    {
-      alert(res.message)
-    }
-    else
+    if(!res instanceof Error)
     {
       console.log(res);
       setUploadedBooks(res.uploaded_books)
       setUploadedBooksCount(res.uploaded_books_count)
     }
+    
       
     
 

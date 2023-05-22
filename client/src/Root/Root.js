@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import Navbar from 'react-bootstrap/Navbar'
 import  Nav  from 'react-bootstrap/Nav'
 import Container from 'react-bootstrap/Container'
@@ -75,6 +75,22 @@ const Root = () => {
   },[])
 
   
+
+  useLayoutEffect(() => {
+    
+    if(isAuthRoute() && HttpClient.isAuth())
+    {
+      
+      nav('/', {replace: true})
+      
+    }
+    else if(isProtectedRoute() && !HttpClient.isAuth())
+    {
+      
+      nav('/auth', {replace: true, })
+      
+    }
+  },[location])
 
   useEffect(() => {
     
