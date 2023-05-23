@@ -1,7 +1,7 @@
 import express from 'express'
 import userModel from '../Models/user.js';
 import bookModel from '../Models/book.js';
-
+import { auth } from './auth.js';
 const router = express.Router();
 
 
@@ -13,7 +13,7 @@ router.get('/', async (req,res) => {
     {
         query.name = {$regex: name}
     }
-    if(tags)
+    if(category)
     {
         query.category = category;
     }
@@ -23,7 +23,7 @@ router.get('/', async (req,res) => {
         .populate({path: 'user', select: 'email avatar'})
         .populate({path: 'category'})
         
-        
+        console.log(allBooksByQuery);
         
         return res.status(200).json(allBooksByQuery)
     } 
@@ -55,7 +55,7 @@ router.get('/:bookId', async (req,res) => {
 
 })
 
-router.post('/', async (req,res) => {
+router.post('/',auth ,async (req,res) => {
     const {category, 
         name,
         authors,
@@ -101,7 +101,7 @@ router.post('/', async (req,res) => {
             
         } 
         catch (error) {
-            throw error
+            
             return res.status(500).json({error: "server error"})
         }
         

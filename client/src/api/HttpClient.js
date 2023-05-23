@@ -7,7 +7,7 @@ class HttpClient{
     static #authStateSubscribers = []
     static #api =axios.create(
     {
-    baseURL: "http://localhost:80/api", 
+    baseURL: "http://localhost:3001/api", 
     validateStatus : (code) => code >= 200
     })
 
@@ -191,6 +191,21 @@ class HttpClient{
             return error;
         }
     }
+
+    static async GetBooks()
+    {
+        try {
+            const res = await this.#api.get('/books/')
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+
+            return res.data;
+        } catch (error) {
+            
+            return error;
+        }
+    }
+
     static async UploadBook(data)
     {
         try {
