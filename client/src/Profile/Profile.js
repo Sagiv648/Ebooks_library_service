@@ -33,15 +33,21 @@ const Profile = () => {
   }
   const fetchBooks = async() => {
     
-    const res = await HttpClient.GetUserBooks();
-    
-    if(!res instanceof Error)
-    {
-      console.log(res);
+    // const res = await HttpClient.GetUserBooks()
+    // console.log(res.uploaded_books);
+    // if(!res instanceof Error)
+    // {
+    //   console.log(res.uploaded_books);
+    //   setUploadedBooks(res.uploaded_books)
+    //   setUploadedBooksCount(res.uploaded_books_count)
+    // }
+    HttpClient.GetUserBooks().then((res) => {
       setUploadedBooks(res.uploaded_books)
       setUploadedBooksCount(res.uploaded_books_count)
-    }
-    
+    })
+    .catch((err) => {
+      console.log(err.message);
+    })
       
     
 
@@ -69,10 +75,10 @@ const Profile = () => {
             <Row style={{fontSize: 20, justifyContent: 'center',marginTop: 20}}>Uploaded books:</Row>
             <Container style={{marginTop: 30, marginBottom: 20}}>
               <Accordion defaultActiveKey={"0"}>
-                {uploadedBooks.length > 0 ? uploadedBooks.map((val,ind) => {
+                {uploadedBooks.length > 0 ? uploadedBooks.map((book,ind) => {
 
                   return (<Accordion.Item key={ind} eventKey={ind+1}>
-                    <BookEntry book={val}/>
+                    <BookEntry book={book}/>
                   </Accordion.Item>)
                 })
                 :
