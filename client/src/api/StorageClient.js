@@ -50,14 +50,14 @@ class StorageClient{
         const ebook_uploaded_name = crypt.SHA1(`${parsed.id}_${parsed.uploaded_books_count + 1}`).toString();
         let coverMime = ""
         if(data.cover)
-        coverMime = data.cover.split('.').slice(-1)
+        coverMime = data.cover.name.split('.').slice(-1)
         const ebooksRef = ref(this.#storageInstance, `ebooks/${ebook_uploaded_name}.pdf`)
         const coverRef = ref(this.#storageInstance, `covers/${ebook_uploaded_name}.${coverMime}`)
         
-        this.#uploadStartSubscribers.forEach((cb) =>cb(data))
+        this.#uploadStartSubscribers.forEach((sub) => sub.cb(data))
          uploadBytesResumable(ebooksRef, data.file,{contentType: "application/pdf"}).on('state_changed', (snapshot) => { 
             
-            this.#progressSubscribers.forEach((cb) => cb({name: data.file.name, 
+            this.#progressSubscribers.forEach((sub) => sub.cb({name: data.file.name, 
                 progress: `${(snapshot.bytesTransferred/snapshot.totalBytes).toFixed(0)*100}%`}))
             
         }, (err) => {
@@ -82,7 +82,7 @@ class StorageClient{
                 {
                     console.log("uploaded");
                     console.log(data);
-                    this.#uploadEndSubscribers.forEach((cb) => cb(res))
+                    this.#uploadEndSubscribers.forEach((sub) => sub.cb(res))
                 }
                     
                

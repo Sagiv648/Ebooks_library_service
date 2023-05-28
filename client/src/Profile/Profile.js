@@ -90,8 +90,9 @@ const Profile = () => {
               <Accordion defaultActiveKey={"0"}>
                 {uploadedBooks.length > 0 ? uploadedBooks.map((book,ind) => {
 
-                  return (<Accordion.Item key={ind} eventKey={ind+1}>
+                  return (<Accordion.Item style={{alignItems: 'center'}} key={ind} eventKey={ind+1}>
                     <BookEntry itemToDelete={itemToDelete} setItemToDelete={setItemToDelete} book={book}/>
+                    
                   </Accordion.Item>)
                 })
                 :
