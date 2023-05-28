@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Card from 'react-bootstrap/Card'
 import Button from 'react-bootstrap/esm/Button'
@@ -6,12 +6,11 @@ import Col from 'react-bootstrap/esm/Col'
 import Row from 'react-bootstrap/esm/Row'
 const BookDisplayEntry = props => {
     const [book, setBook] = useState(props.book)
-    console.log(props.book);
+    //console.log(props.book);
     const expansion = props.expansionSetter
     const exapndedBookSetter = props.expandedBookSetter
-
     
-
+    
 
     return (
         <Card style={{width: 250,alignItems: 'center'}}>
@@ -27,6 +26,7 @@ const BookDisplayEntry = props => {
                     <Col style={{height: 100}}><Button onClick={() => {
                         expansion(true)
                         exapndedBookSetter(book)
+                        
                     }}>Expand</Button></Col>
                     <Col style={{height: 100}}><Button onClick={() => {
                         window.open(book.download_url, book.name)

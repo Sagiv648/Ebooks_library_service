@@ -16,12 +16,16 @@ import ListGroupItem from 'react-bootstrap/esm/ListGroupItem'
 import BookDisplayEntry from '../components/BookDisplayEntry'
 import Button from 'react-bootstrap/esm/Button'
 import BookDisplayExpansion from '../components/BookDisplayExpansion'
+import SearchResults from '../components/SearchResults'
+import BooksCollection from '../components/BooksCollection'
 
 
 const Home = () => {
-const [queriedBooks,setQueriedBooks] = useState([])
+  
   const [books, setAllBooks] = useState([])
   const [expandedBook, setExpandedBook] = useState({})
+  const [search, setSearch] = useState(false)
+  const [queriedBooks,setQueriedBooks] = useState([]);
   const fetchAllBooks = async () => {
   
     const res = await HttpClient.GetBooks();
@@ -32,7 +36,7 @@ const [queriedBooks,setQueriedBooks] = useState([])
     else
     {
       setAllBooks(res)
-      setQueriedBooks(res)
+      
     }
   }
 const fetchCategories = async () => {
@@ -51,26 +55,27 @@ const fetchCategories = async () => {
     fetchAllBooks();
     fetchCategories()
   },[])
- 
-  const nav = useNavigation();
+ const nav = useNavigation();
   const [name, setName] = useState("")
   
   const [selectedCategory, setSelectedCategory] = useState({name: "All"}) 
   const [categories, setCategories] = useState([{name: "All"}])
   const [exapnded,setExpanded] = useState(false)
+  
   const query = () => {
+
+    
+
+    
     if(selectedCategory.name !== 'All')
       setQueriedBooks(books.filter((book,index) => book.category.name === selectedCategory.name && book.name.includes(name)))
     else
       setQueriedBooks(books.filter((book,index) => book.name.includes(name)))
-    //setQueriedBooks(books.filter())
+    
   }
-  //  useEffect(() => {
-  //    if(selectedCategory.name !== 'All')
-  //       queryByCategory()
-  // },[selectedCategory])
-
+  
   return (
+    
     !exapnded ?
     <Container>
       <ToastContainer/>
@@ -92,39 +97,41 @@ const fetchCategories = async () => {
       </Row>
       <Row>
         <Col>
-        <Button style={{marginTop: 10, width: 200, height: 50}} onClick={() => {
-            query()
+        {
+          search ?
+          <Button onClick={() => {
+            setSearch(false)
+           }}>Clear</Button>
+           :
+            <Button style={{marginTop: 10, width: 200, height: 50}} onClick={() => {
+              if(name !== "" || selectedCategory.name !== 'All')
+              {
+                query()
+                setSearch(true)
+              }
+            
+            
           }}>Search</Button>
+        }
+       
         </Col>
      
       </Row>
-          {
-            queriedBooks.length > 0 && 
-            (
-              <ListGroup style={{ marginTop: 30}}>
-                <Row>
-                {
-                  queriedBooks.map((book, index) => {
-                    return (
-                      <Col style={{marginBottom: 30}} key={index}>
-                      
-                      <BookDisplayEntry expandedBookSetter={setExpandedBook} expansionSetter={setExpanded} book={book}/>
-                  
-                      </Col>
-                    )
-                  })
-                }
-                
-                </Row>
-                
-                
-                
-              </ListGroup>
-            )
-          }
+      {
+        search ?
+         <>
+         <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={queriedBooks} />
+         
+         </>
+         : 
+         <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={books} />
+      }
+          
+          
           
     </Container>
     : 
+    
     <>
     <BookDisplayExpansion expandedBook={expandedBook} expansionSetter={setExpanded}/>
     </>

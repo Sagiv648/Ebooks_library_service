@@ -20,7 +20,7 @@ app.use('/api/user', userRouter)
 
 
 app.use('/api/books', booksRouter)
-app.use('/api/categories',auth, categoryRouter);
+app.use('/api/categories', categoryRouter);
 
 app.use((req,res) => {
     

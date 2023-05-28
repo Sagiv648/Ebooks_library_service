@@ -24,8 +24,8 @@ class HttpClient{
         
         try {
             const token = this.#GetToken();
-            const res = await this.#api.get('/categories/', {headers: 
-                { authorization: `Bearer ${token}` }})
+            const res = await this.#api.get('/categories/')
+            
             if(res.status !== 200)
                 throw new Error(res.data.error)
             return res.data;
