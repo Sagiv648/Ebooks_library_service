@@ -5,8 +5,8 @@ import Spinner from 'react-bootstrap/Spinner'
 
 const Loader = () => {
   return (
-        <Container>
-            <Spinner animation='border'/>
+        <Container >
+            <Spinner  animation='border' size='large'/>
         </Container>
   )
 }

@@ -9,6 +9,8 @@ import HttpClient from '../api/HttpClient'
 import Col from 'react-bootstrap/esm/Col'
 import Accordion from 'react-bootstrap/Accordion'
 import BookEntry from '../components/BookEntry'
+import Loader from '../components/Loader'
+import Spinner from 'react-bootstrap/esm/Spinner'
 //TODO: Profile
 const Profile = () => {
   
@@ -18,8 +20,8 @@ const Profile = () => {
   const inputCoverRef = useRef();
   const [uploadedBooksCount, setUploadedBooksCount] = useState(0)
   const [uploadedBooks, setUploadedBooks] = useState([])
-
-  
+  const [isLoading, setIsLoading] = useState(false)
+  const [itemToDelete,setItemToDelete] = useState({})
 
   const fetchProfile = () => {
     const profile = HttpClient.GetProfile();
@@ -29,6 +31,7 @@ const Profile = () => {
       setAvatar(profile.avatar)
       
     }
+    
 
   }
   const fetchBooks = async() => {
@@ -41,12 +44,15 @@ const Profile = () => {
     //   setUploadedBooks(res.uploaded_books)
     //   setUploadedBooksCount(res.uploaded_books_count)
     // }
+    setIsLoading(true)
     HttpClient.GetUserBooks().then((res) => {
       setUploadedBooks(res.uploaded_books)
       setUploadedBooksCount(res.uploaded_books_count)
+      setIsLoading(false)
     })
     .catch((err) => {
       console.log(err.message);
+      setIsLoading(false)
     })
       
     
@@ -73,12 +79,19 @@ const Profile = () => {
         <Col >
           <Row style={{justifyContent: 'center'}}>
             <Row style={{fontSize: 20, justifyContent: 'center',marginTop: 20}}>Uploaded books:</Row>
-            <Container style={{marginTop: 30, marginBottom: 20}}>
+            {
+              isLoading ?
+              
+              <p style={{alignSelf: 'center'}}>Gathering items...</p>
+              
+              
+              :
+              <Container style={{marginTop: 30, marginBottom: 20}}>
               <Accordion defaultActiveKey={"0"}>
                 {uploadedBooks.length > 0 ? uploadedBooks.map((book,ind) => {
 
                   return (<Accordion.Item key={ind} eventKey={ind+1}>
-                    <BookEntry book={book}/>
+                    <BookEntry itemToDelete={itemToDelete} setItemToDelete={setItemToDelete} book={book}/>
                   </Accordion.Item>)
                 })
                 :
@@ -88,6 +101,8 @@ const Profile = () => {
               </Accordion>
               
             </Container>
+            }
+            
 
           </Row>
         </Col>

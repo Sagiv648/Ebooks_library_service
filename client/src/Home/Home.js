@@ -18,6 +18,7 @@ import Button from 'react-bootstrap/esm/Button'
 import BookDisplayExpansion from '../components/BookDisplayExpansion'
 import SearchResults from '../components/SearchResults'
 import BooksCollection from '../components/BooksCollection'
+import Spinner from 'react-bootstrap/esm/Spinner'
 
 
 const Home = () => {
@@ -26,15 +27,17 @@ const Home = () => {
   const [expandedBook, setExpandedBook] = useState({})
   const [search, setSearch] = useState(false)
   const [queriedBooks,setQueriedBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(false)
   console.log(search);
   const fetchAllBooks = async () => {
-  
+    setIsLoading(true)
      HttpClient.GetBooks().then((res) => {
       console.log(res);
         setAllBooks(res)
      })
      .catch((err) => {
       toast.error(err.message)
+      setIsLoading(false)
      })
     // if(res instanceof Error)
     // {
@@ -54,9 +57,11 @@ const fetchCategories = async () => {
     
     setCategories([...res,{name: "All"}] )
     setSelectedCategory(categories[categories.length-1])
+    setIsLoading(false)
   })
   .catch((err) => {
     console.log(err.message);
+    setIsLoading(false)
   })
 }
   useEffect(() => {
@@ -107,7 +112,8 @@ const fetchCategories = async () => {
                 {categories.length > 0 && categories.map((val,ind) => 
                 (<DropDown.Item onClick={(e) => setSelectedCategory(val)} key={ind}>{val.name}</DropDown.Item>))}
               </DropDown.Menu>
-          </DropDown></Col>
+          </DropDown>
+          </Col>
           
          
           
@@ -131,13 +137,25 @@ const fetchCategories = async () => {
         </Col>
      
       </Row>
-       
-      
-      
-      {
+       <Container >
+         {
+        isLoading ? 
+        
+        <p style={{alignSelf: 'center'}}>Gathering items...</p>
+        :
+        (
+        <Container>
+        {
         books.length !== 0 &&
         <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={books} />
-      }
+        }
+      </Container>)
+       }
+       </Container>
+      
+      
+      
+      
       
           
           

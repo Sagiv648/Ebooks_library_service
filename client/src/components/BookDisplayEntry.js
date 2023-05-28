@@ -10,8 +10,8 @@ const BookDisplayEntry = props => {
     const expansion = props.expansionSetter
     const exapndedBookSetter = props.expandedBookSetter
     
-    
-
+    const noExpand = props.noExpand;
+    const deleteAble = props.deleteAble
     return (
         <Card style={{width: 250,alignItems: 'center'}}>
             <Card.Img variant='top' style={{width: '75%', height: 200}} src={book.cover_image ? book.cover_image : '../default-cover.png'}/>
@@ -23,16 +23,31 @@ const BookDisplayEntry = props => {
                 <Card.Body>{book.category.name}</Card.Body>
                 
                 <Row style={{marginTop: 20, justifyContent: 'center'}}>
-                    <Col style={{height: 100}}><Button onClick={() => {
-                        expansion(true)
-                        exapndedBookSetter(book)
-                        
-                    }}>Expand</Button></Col>
+                    {
+                        !noExpand &&
+                        <Col style={{height: 100}}><Button onClick={() => {
+                            expansion(true)
+                            exapndedBookSetter(book)
+                            
+                        }}>Expand</Button></Col>
+                    }
+                    
                     <Col style={{height: 100}}><Button onClick={() => {
                         window.open(book.download_url, book.name)
                         
-                    }} variant='success'>Download</Button></Col>
+                    }} variant='success'>Download</Button>
+                    {deleteAble &&
+                        <Row style={{marginTop: 5}}>
+                            <Button variant='danger' onClick={(e) => {
+                                
+                            }}>
+                            Delete
+                            </Button>
+                        </Row>
+                    }
+                    </Col>
                 </Row>
+                
                
             
             
