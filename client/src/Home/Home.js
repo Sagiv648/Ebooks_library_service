@@ -26,18 +26,26 @@ const Home = () => {
   const [expandedBook, setExpandedBook] = useState({})
   const [search, setSearch] = useState(false)
   const [queriedBooks,setQueriedBooks] = useState([]);
+  console.log(search);
   const fetchAllBooks = async () => {
   
-    const res = await HttpClient.GetBooks();
-    if(res instanceof Error)
-    {
-      toast.error(res.message)
-    }
-    else
-    {
-      setAllBooks(res)
+     HttpClient.GetBooks().then((res) => {
+      console.log(res);
+        setAllBooks(res)
+     })
+     .catch((err) => {
+      toast.error(err.message)
+     })
+    // if(res instanceof Error)
+    // {
+    //   toast.error(res.message)
+    // }
+    // else
+    // {
+    //   console.log(res);
       
-    }
+      
+    // }
   }
 const fetchCategories = async () => {
 
@@ -55,7 +63,8 @@ const fetchCategories = async () => {
     fetchAllBooks();
     fetchCategories()
   },[])
- const nav = useNavigation();
+
+  const nav = useNavigation();
   const [name, setName] = useState("")
   
   const [selectedCategory, setSelectedCategory] = useState({name: "All"}) 
@@ -73,10 +82,19 @@ const fetchCategories = async () => {
       setQueriedBooks(books.filter((book,index) => book.name.includes(name)))
     
   }
-  
+  const qbooks = books.filter((book) => book.name.includes(name))
   return (
     
     !exapnded ?
+    search ?
+    <Container>
+    <Button onClick={() => {
+            setSearch(false)
+           }}>Clear</Button>
+    <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={queriedBooks} />
+
+    </Container>
+    :
     <Container>
       <ToastContainer/>
       <Row>
@@ -97,12 +115,8 @@ const fetchCategories = async () => {
       </Row>
       <Row>
         <Col>
-        {
-          search ?
-          <Button onClick={() => {
-            setSearch(false)
-           }}>Clear</Button>
-           :
+        
+          
             <Button style={{marginTop: 10, width: 200, height: 50}} onClick={() => {
               if(name !== "" || selectedCategory.name !== 'All')
               {
@@ -112,20 +126,19 @@ const fetchCategories = async () => {
             
             
           }}>Search</Button>
-        }
+        
        
         </Col>
      
       </Row>
+       
+      
+      
       {
-        search ?
-         <>
-         <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={queriedBooks} />
-         
-         </>
-         : 
-         <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={books} />
+        books.length !== 0 &&
+        <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={books} />
       }
+      
           
           
           

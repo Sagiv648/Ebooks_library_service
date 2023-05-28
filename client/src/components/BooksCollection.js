@@ -8,6 +8,7 @@ const BooksCollection = props => {
     const expandedBookSetter = props.expandedBookSetter
     const expansionSetter=props.expansionSetter
   return (
+    
     <ListGroup style={{ marginTop: 30}}>
                 <Row>
                 {
