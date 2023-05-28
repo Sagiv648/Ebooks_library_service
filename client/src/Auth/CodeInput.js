@@ -45,18 +45,21 @@ const CodeInput = (props) => {
               generateColsArr().map((val,ind) => {
                 return (
                   <FormControl
-                  
+                  className={`${ind}`}
                   onChange={(e) => {
                     if(code.length < ind)
                       setCode([...code,e.target.value])
                     else
                       code[ind] = e.target.value;
+                      
+                        document.getElementById(`code-input-${ind+1}`).focus()
                   }}
                   style={{alignSelf: 'center',textAlign: 'center',fontSize: 40,width: 50, margin: 20}} key={ind} id={`code-input-${ind}`} maxLength={1} type='text'></FormControl>
                   )
                 
               })
             }
+            <FormControl disabled id='code-input-6' style={{visibility: 'hidden'}}/>
           </Row>
           
           

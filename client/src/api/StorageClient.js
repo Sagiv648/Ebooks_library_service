@@ -9,17 +9,29 @@ class StorageClient{
     static #uploadStartSubscribers = []
     static #uploadsCounter = 0
 
-    static SubscribeForProgress(cb)
+    static SubscribeForProgress(cb,id)
     {
-        this.#progressSubscribers.push(cb);
+        this.#progressSubscribers.push({cb: cb, id: id});
     }
-    static SubscribeForUploadEnd(cb)
+    static SubscribeForUploadEnd(cb,id)
     {
-        this.#uploadEndSubscribers.push(cb)
+        this.#uploadEndSubscribers.push({cb: cb, id: id})
     }
-    static SubscribeForUploadStart(cb)
+    static SubscribeForUploadStart(cb,id)
     {
-        this.#uploadStartSubscribers.push(cb)
+        this.#uploadStartSubscribers.push({cb: cb, id: id})
+    }
+    static UnsubscribeUploadStart(id)
+    {
+        this.#uploadStartSubscribers= this.#uploadStartSubscribers.filter((x) => x.id !== id)
+    }
+    static UnsubcribeUploadEnd(id)
+    {
+        this.#uploadEndSubscribers = this.#uploadEndSubscribers.filter((x) => x.id !== id)
+    }
+    static UnsubscribeUploadProgress(id)
+    {
+        this.#progressSubscribers = this.#progressSubscribers.filter((x) => x.id !== id)
     }
     static RemoveSubscriptions()
     {
@@ -36,9 +48,11 @@ class StorageClient{
         const uploadIndex = this.#uploadsCounter
         this.#uploadsCounter++;
         const ebook_uploaded_name = crypt.SHA1(`${parsed.id}_${parsed.uploaded_books_count + 1}`).toString();
-        
-        const ebooksRef = ref(this.#storageInstance, `ebooks/${ebook_uploaded_name}`)
-        const coverRef = ref(this.#storageInstance, `covers/${ebook_uploaded_name}`)
+        let coverMime = ""
+        if(data.cover)
+        coverMime = data.cover.split('.').slice(-1)
+        const ebooksRef = ref(this.#storageInstance, `ebooks/${ebook_uploaded_name}.pdf`)
+        const coverRef = ref(this.#storageInstance, `covers/${ebook_uploaded_name}.${coverMime}`)
         
         this.#uploadStartSubscribers.forEach((cb) =>cb(data))
          uploadBytesResumable(ebooksRef, data.file,{contentType: "application/pdf"}).on('state_changed', (snapshot) => { 
