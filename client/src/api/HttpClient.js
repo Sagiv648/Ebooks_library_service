@@ -5,6 +5,7 @@ class HttpClient{
 
     static #token = null;
     static #authStateSubscribers = []
+    static #profileChangeSubscribers = []
     static #api =axios.create(
     {
     baseURL: "http://localhost:3001/api", 
@@ -19,6 +20,14 @@ class HttpClient{
     static #GetToken() {
         const item = localStorage.getItem("token")
         return item;
+    }
+    static SubscribeProfileChange(data)
+    {
+        this.#profileChangeSubscribers.push(data)
+    }
+    static UnsubscribeProfileChange(id)
+    {
+        this.#profileChangeSubscribers = this.#profileChangeSubscribers.filter((entry) => entry.id !== id)
     }
     static async GetCategories() {
         
@@ -202,6 +211,31 @@ class HttpClient{
             return res.data;
         } catch (error) {
             
+            return error;
+        }
+    }
+
+    static async DeleteBook(book)
+    {
+        try {
+            const token = this.#GetToken();
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.delete(`/books/${book._id}`, {headers: {
+                authorization: `Bearer ${token}`
+            }} )
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+
+            const storageItem = localStorage.getItem('profile')
+            const item = JSON.parse(storageItem)
+            const filteredBooks = item.uploaded_books.filter((entry) => entry._id !== book._id)
+            item.uploaded_books_count = item.uploaded_books_count-1
+            item.uploaded_books = filteredBooks
+            localStorage.setItem('profile', JSON.stringify(item))
+            this.#profileChangeSubscribers.forEach((entry) => entry.cb(res.data))
+            return res.data;
+        } catch (error) {
             return error;
         }
     }

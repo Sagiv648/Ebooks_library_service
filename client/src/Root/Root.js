@@ -14,7 +14,14 @@ import {toast, ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 
 
-
+//Task lists:
+//TODO: 1) Use own storage api for the files storage, write StorageClient to do so
+//TODO: 2) Implement avatar upload
+//TODO: 3) Implement username for a new user, implement edit profile to edit username
+//TODO: 4) Implement reviews page
+//TODO: 5) Implement most downloaded books screen horizontal runner, (Implement download count in the server)
+//TODO: 6) Implement HTTP call for download count increment
+//TODO: 7) Implement a button to add a review for the book
 const Root = () => {
 
   const [collapsed, setCollapsed] = useState(false)
@@ -55,19 +62,19 @@ const Root = () => {
         setProfile(null)
       }
       })
-      StorageClient.SubscribeForUploadEnd((data) => {
-        console.log(data);
-        toast.success(`Book ${data.name} has been successfully uploaded`)
-        //setUploads(uploads.filter((val,ind) => ind != index))
-      })
-      StorageClient.SubscribeForUploadStart((data) => {
-        toast.info(`Book ${data.name} has began it's upload`)
-        setUploads([...uploads, {...data, finished: false}])
-      })
-    StorageClient.SubscribeForProgress((data) => {
-      //toast.info(`Progress on ${data.name}\n${data.progress}`)
-    })
-   
+    //   StorageClient.SubscribeForUploadEnd((data) => {
+    //     console.log(data);
+    //     toast.success(`Book ${data.name} has been successfully uploaded`)
+    //     //setUploads(uploads.filter((val,ind) => ind != index))
+    //   })
+    //   StorageClient.SubscribeForUploadStart((data) => {
+    //     toast.info(`Book ${data.name} has began it's upload`)
+    //     setUploads([...uploads, {...data, finished: false}])
+    //   })
+    // StorageClient.SubscribeForProgress((data) => {
+    //   //toast.info(`Progress on ${data.name}\n${data.progress}`)
+    // })
+   console.log("xxxx");
     return () => {
       StorageClient.RemoveSubscriptions();
       console.log("un rendered");

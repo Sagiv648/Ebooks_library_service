@@ -13,7 +13,7 @@ import DropDown from 'react-bootstrap/Dropdown'
 import StorageClient from '../api/StorageClient'
 import {toast,ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
-//TODO: Publish
+
 const Publish = () => {
 
   const [bookName, setBookName] = useState("")
@@ -43,7 +43,7 @@ const Publish = () => {
   const handleUpload = async () => {
     
 
-    if(selectedCategory.id === null || file === null || bookName === "")
+    if(selectedCategory.name === "Select a category" || file === null || bookName === "")
     {
       toast.error("Invalid fields at file/category/book name")
       return;
@@ -138,7 +138,7 @@ setBookDescription("")
 filePickerRef.current.value = ""
 
 }
-//TODO: Submit in the storage class
+
 const submit = async () => {
   handleUpload(null)
   //await uploadFileTesting();

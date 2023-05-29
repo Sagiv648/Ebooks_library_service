@@ -11,7 +11,7 @@ import Accordion from 'react-bootstrap/Accordion'
 import BookEntry from '../components/BookEntry'
 import Loader from '../components/Loader'
 import Spinner from 'react-bootstrap/esm/Spinner'
-//TODO: Profile
+
 const Profile = () => {
   
   const [profile,setProfile] = useState(null)
@@ -36,14 +36,7 @@ const Profile = () => {
   }
   const fetchBooks = async() => {
     
-    // const res = await HttpClient.GetUserBooks()
-    // console.log(res.uploaded_books);
-    // if(!res instanceof Error)
-    // {
-    //   console.log(res.uploaded_books);
-    //   setUploadedBooks(res.uploaded_books)
-    //   setUploadedBooksCount(res.uploaded_books_count)
-    // }
+    
     setIsLoading(true)
     HttpClient.GetUserBooks().then((res) => {
       setUploadedBooks(res.uploaded_books)
@@ -64,14 +57,11 @@ const Profile = () => {
     fetchBooks();
     fetchProfile();
     
-
-    
     
   },[])
 
 
-//TODO: Fetch the user's uploaded books
-//TODO: Implement pagination
+
   return (
     
       <Container style={{backgroundColor: 'AppWorkspace',marginTop: 20,width: '80%',borderRadius: 25, borderStyle: 'outset',borderWidth: 1}} fluid>
@@ -88,10 +78,10 @@ const Profile = () => {
               :
               <Container style={{marginTop: 30, marginBottom: 20}}>
               <Accordion defaultActiveKey={"0"}>
-                {uploadedBooks.length > 0 ? uploadedBooks.map((book,ind) => {
+                {uploadedBooks.length != 0 ? uploadedBooks.map((book,ind) => {
 
-                  return (<Accordion.Item style={{alignItems: 'center'}} key={ind} eventKey={ind+1}>
-                    <BookEntry itemToDelete={itemToDelete} setItemToDelete={setItemToDelete} book={book}/>
+                  return (<Accordion.Item style={{alignItems: 'center'}} key={book._id} eventKey={ind}>
+                    <BookEntry uploadedBooks={uploadedBooks} setUploadedBooks={setUploadedBooks}  itemToDelete={itemToDelete} setItemToDelete={setItemToDelete} book={book}/>
                     
                   </Accordion.Item>)
                 })

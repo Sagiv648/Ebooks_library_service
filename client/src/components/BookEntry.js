@@ -7,14 +7,15 @@ import FormControl from 'react-bootstrap/FormControl'
 import Col from 'react-bootstrap/esm/Col'
 const BookEntry = (props) => {
     const [book, setBook] = useState(props.book)
-    
+    const uploadedBooks = props.uploadedBooks
+    const setUploadedBooks = props.setUploadedBooks
  
   return (
     <Container>
         <Accordion.Header>{book.name}</Accordion.Header>
         <Accordion.Body style={{justifyContent: 'center'}}>
           <Row >
-            <Col><BookDisplayEntry deleteAble={true} book={book} noExpand={true}/>
+            <Col><BookDisplayEntry uploadedBooks={uploadedBooks} setUploadedBooks={setUploadedBooks} deleteAble={true} book={book} noExpand={true}/>
             </Col>
           <Col><FormControl style={{width: 250}} value={book.description} maxLength={1000} as={'textarea'} disabled rows={6}/>
           </Col>

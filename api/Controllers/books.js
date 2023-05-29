@@ -55,6 +55,27 @@ router.get('/:bookId', async (req,res) => {
 
 })
 
+
+router.delete('/:bId', auth, async (req,res) => {
+    const {bId} = req.params;
+    const {id} = req.data;
+    
+    if(!bId)
+        return res.status(400).json({error: "invalid fields"})
+    try {
+        const deleted = await bookModel.findByIdAndDelete(bId,{returnDocument: 'after'})
+        if(!deleted)
+            return res.status(400).json({error: "invalid id"})
+        const user = await userModel.findById(id)
+        await user.uploaded_books.pull({_id: bId})
+        
+        return res.status(200).json({book: deleted})
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({error: 'server error'})
+    }
+})
+
 router.post('/',auth ,async (req,res) => {
     const {category, 
         name,
