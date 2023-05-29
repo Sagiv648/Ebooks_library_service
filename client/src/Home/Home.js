@@ -19,7 +19,7 @@ import BookDisplayExpansion from '../components/BookDisplayExpansion'
 import SearchResults from '../components/SearchResults'
 import BooksCollection from '../components/BooksCollection'
 import Spinner from 'react-bootstrap/esm/Spinner'
-
+import Marquee from 'react-fast-marquee'
 
 const Home = () => {
   
@@ -28,12 +28,21 @@ const Home = () => {
   const [search, setSearch] = useState(false)
   const [queriedBooks,setQueriedBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
+  const [topFiveDownloads,setTopFiveDownloads]=useState([])
   console.log(search);
   const fetchAllBooks = async () => {
     setIsLoading(true)
      HttpClient.GetBooks().then((res) => {
-      console.log(res);
-        setAllBooks(res)
+      setAllBooks(res)
+        const sorted = res.sort((entry1,entry2) => entry2.downloads_count - entry1.downloads_count)
+        const topfive =[]
+        for(let i = 0; i < sorted.length && i < 5; i++)
+        {
+          topfive.push(sorted[i])
+        }
+        setTopFiveDownloads(topfive)
+        
+        
      })
      .catch((err) => {
       toast.error(err.message)
@@ -96,6 +105,7 @@ const fetchCategories = async () => {
     <Button onClick={() => {
             setSearch(false)
            }}>Clear</Button>
+           <Row style={{fontSize: 30}}>Results:</Row>
     <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={queriedBooks} />
 
     </Container>
@@ -137,7 +147,19 @@ const fetchCategories = async () => {
         </Col>
      
       </Row>
-       <Container >
+      {
+        topFiveDownloads.length !== 0 &&
+        <Container style={{alignSelf: 'center'}}>
+        <Row style={{alignSelf: 'center'}}>
+          <Marquee speed={50}>
+          {topFiveDownloads.map((entry) => (<BookDisplayEntry expandedBookSetter={setExpanded} book={entry}/>))}
+          
+          </Marquee>
+        </Row>
+      </Container>
+      }
+      
+       <Container style={{backgroundColor: 'whitesmoke', borderWidth: 1, borderStyle: 'outset',marginTop: 20}} >
          {
         isLoading ? 
         

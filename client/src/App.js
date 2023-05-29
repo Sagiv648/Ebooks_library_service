@@ -10,11 +10,14 @@ import Publish from './Publish/Publish';
 import Profile from './Profile/Profile';
 import Auth from './Auth/Auth';
 import Uploads from './Uploads/Uploads';
+import Console from './Console/Console';
+import ErrorPage from './components/ErrorPage';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Root/>,
+    errorElement: <ErrorPage/>,
     children: [
       {
         
@@ -40,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: 'uploads',
         element: <Uploads/>
+      },
+      {
+        path: 'console',
+        element: <Console/>
       }
       
     

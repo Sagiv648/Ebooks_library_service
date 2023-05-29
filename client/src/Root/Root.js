@@ -29,6 +29,7 @@ const Root = () => {
   const [profile,setProfile] = useState(null)
  
   const [uploads, setUploads] = useState([])
+  const [privileged, setPrivileged] = useState(false)
   const nav = useNavigate();
   const location = useLocation();
 
@@ -46,6 +47,10 @@ const Root = () => {
     return location.pathname === '/publish' || location.pathname === '/profile'
   }
   
+  const isPrivilegedRoute = () => {
+    return location.pathname === '/console'
+  }
+
   useEffect(() => {
     console.log("it renderes once no?");
     HttpClient.FetchStorage((profile) => {
@@ -62,22 +67,14 @@ const Root = () => {
         setProfile(null)
       }
       })
-    //   StorageClient.SubscribeForUploadEnd((data) => {
-    //     console.log(data);
-    //     toast.success(`Book ${data.name} has been successfully uploaded`)
-    //     //setUploads(uploads.filter((val,ind) => ind != index))
-    //   })
-    //   StorageClient.SubscribeForUploadStart((data) => {
-    //     toast.info(`Book ${data.name} has began it's upload`)
-    //     setUploads([...uploads, {...data, finished: false}])
-    //   })
-    // StorageClient.SubscribeForProgress((data) => {
-    //   //toast.info(`Progress on ${data.name}\n${data.progress}`)
-    // })
-   console.log("xxxx");
+      HttpClient.SubscribeProfileChange({id: "root", cb: (data) => {
+        setProfile(data)
+      }})
+    
+   
     return () => {
-      StorageClient.RemoveSubscriptions();
-      console.log("un rendered");
+      HttpClient.UnsubscribeProfileChange("root")
+      
     }
   },[])
 
@@ -97,6 +94,10 @@ const Root = () => {
       nav('/auth', {replace: true, })
       
     }
+    else if(isPrivilegedRoute() && !HttpClient.isAuth())
+    {
+      nav('/', {replace: true})
+    }
   },[location])
 
   useEffect(() => {
@@ -114,8 +115,13 @@ const Root = () => {
       nav('/auth', {replace: true, })
       
     }
-    
+    else if(isPrivilegedRoute() && !HttpClient.isPrivileged())
+    {
+      nav('/', {replace: true})
+    }
 
+    if(HttpClient.isPrivileged())
+      setPrivileged(true)
     
    
     
@@ -146,6 +152,10 @@ const Root = () => {
               
               <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
               <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
+              {
+                privileged && <Nav.Item><Link className='nav-item' to={'console'}>Console</Link></Nav.Item>
+              }
+              
               {/* <Nav.Item>
                 <Link className='nav-item' to={'uploads'}>Uploads</Link>
                 {
@@ -174,7 +184,7 @@ const Root = () => {
             )
           }
           {
-            profile ? <Navbar.Brand>{profile.email}</Navbar.Brand> : <Navbar.Brand>Guest</Navbar.Brand>
+            profile ? <Navbar.Brand>{profile.username ? profile.username : profile.email}</Navbar.Brand> : <Navbar.Brand>Guest</Navbar.Brand>
           }
           
           {profile && <Navbar.Brand onClick={() => {

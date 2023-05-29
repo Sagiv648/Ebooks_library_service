@@ -9,6 +9,10 @@ const schema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "user"
     },
+    downloads_count: {
+        type: Number,
+        default: 0
+    },
     name: String,
     authors: Array,
     description: String,

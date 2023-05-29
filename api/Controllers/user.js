@@ -13,7 +13,7 @@ const router = express.Router();
 //Password is hashed in the client
 router.post('/signup', async (req,res) => {
 
-    const {email, password} = req.body;
+    const {email, password, username, description} = req.body;
     if(!email || !password)
         return res.status(400).json({error: "invalid fields"})
     try {
@@ -26,6 +26,8 @@ router.post('/signup', async (req,res) => {
         const emailPayload = {
             email: email,
             password: password,
+            username: username,
+            description: description
         }
         const emailToken = jwt.sign(emailPayload, process.env.EMAIL_CONFIRMATION_SECRET, {expiresIn: '15m'})
         if(!emailToken)
@@ -71,7 +73,8 @@ router.post('/signin', async (req,res) => {
         if(password != exists.password)
             return res.status(400).json({error: "invalid credentials"})
         const token = jwt.sign({
-            id: exists._id
+            id: exists._id,
+            privilege: exists.privilege
         }, process.env.KEY)
         if(token)
         {
@@ -80,6 +83,9 @@ router.post('/signin', async (req,res) => {
                 email: exists.email,
                 avatar: exists.avatar,
                 id: exists._id,
+                username: exists.username,
+                downloaded_books: exists.downloaded_books,
+                description: exists.description,
                 uploaded_books: exists.uploaded_books,
                 uploaded_books_count: exists.uploaded_books_count},token: token})
         }
@@ -99,23 +105,14 @@ router.get('/confirm/:payload', emailTokenAuth, async (req,res) => {
     const {a} = req.query;
     console.log(a);
 
-    const {email,password} = req.data;
-    const newUser = new userModel({email: email, password: password})
+    const {email,password, description, username} = req.data;
+    const newUser = new userModel({email: email, password: password, description: description, username: username})
 
     const saved = await newUser.save();
+    const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+    const html = fs.readFileSync(`${__dirname}/../emailVerified.html`).toString();
+    return res.status(200).send(html)
     
-    const token = jwt.sign({
-        id: saved._id
-    },process.env.KEY);
-    if(token)
-    {
-        const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-        const html = fs.readFileSync(`${__dirname}/../emailVerified.html`).toString();
-        return res.status(200).send(html)
-        
-    }
-    else
-        return res.status(500).json({error: "server error"})
 
 })
 
@@ -144,11 +141,21 @@ router.post('/reset', async (req,res) => {
     }
 })
 
-router.get('/reset/:payload', async (req,res) => {
-    
 
+
+router.put('/profile', auth, async (req,res) => {
+    const {id} = req.data;
+    const data = req.body
+    console.log("here?");
+    try {
+        const updatedUser = await userModel.findByIdAndUpdate(id,data, {returnDocument: 'after'}).select('-password')
+        if(!updatedUser)
+            return res.status(500).json({error: "server error"})
+        return res.status(200).json(updatedUser)
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
+    }
 })
-
 
 router.put('/:payload', async (req,res) => {
     const {payload} = req.params;

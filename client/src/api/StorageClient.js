@@ -39,7 +39,22 @@ class StorageClient{
         this.#uploadEndSubscribers = []
         this.#uploadStartSubscribers = []
     }
-    static UploadEbook(data)
+    static async UploadAvatar(data) 
+    {
+        const avatar_name = crypt.SHA1(data.id).toString()
+        const avatar_mime = data.avatar.name.split('.').slice(-1)
+        const avatarsRef = ref(this.#storageInstance, `avatars/${avatar_name}.${avatar_mime}`)
+        const uploaded = await uploadBytes(avatarsRef, data.avatar, {contentType: `image/${avatar_mime}`})
+        if(!uploaded)
+            return null;
+            console.log(uploaded);
+        const url = await getDownloadURL(uploaded.ref)
+        if(!url)
+            return null;
+        console.log(url);
+        return url;
+    }
+    static UploadEbook(data, cbStart, cbProgress, cbFinished,cbError)
     {
         const item = localStorage.getItem("profile")
         if(item == null)
@@ -54,14 +69,14 @@ class StorageClient{
         const ebooksRef = ref(this.#storageInstance, `ebooks/${ebook_uploaded_name}.pdf`)
         const coverRef = ref(this.#storageInstance, `covers/${ebook_uploaded_name}.${coverMime}`)
         
-        this.#uploadStartSubscribers.forEach((sub) => sub.cb(data))
-         uploadBytesResumable(ebooksRef, data.file,{contentType: "application/pdf"}).on('state_changed', (snapshot) => { 
+        cbStart()
+        uploadBytesResumable(ebooksRef, data.file,{contentType: "application/pdf"}).on('state_changed', (snapshot) => { 
+            cbProgress({name: data.file.name, progress: `${snapshot.bytesTransferred}/${snapshot.totalBytes}`})
+            //cbProgress({name: data.file.name, progress: `${(snapshot.bytesTransferred/snapshot.totalBytes).toFixed(0)*100}%`})
             
-            this.#progressSubscribers.forEach((sub) => sub.cb({name: data.file.name, 
-                progress: `${(snapshot.bytesTransferred/snapshot.totalBytes).toFixed(0)*100}%`}))
             
         }, (err) => {
-            console.log(err.message);
+            cbError(err)
         }, async () => {
             //console.log("this one");
             getDownloadURL(ebooksRef).then(async (url) => {
@@ -77,18 +92,18 @@ class StorageClient{
 
                 const res = await HttpClient.UploadBook(data)
                 if(res instanceof Error)
-                    console.log(res.message);
+                    cbError(res)
                 else
-                {
-                    console.log("uploaded");
-                    console.log(data);
-                    this.#uploadEndSubscribers.forEach((sub) => sub.cb(res))
+                {   
+                    console.log("finished");
+                    cbFinished(res.data)
+                    
                 }
                     
                
             })
             .catch((err) => {
-                console.log(err.message);
+                cbError(err)
             })
            
         })

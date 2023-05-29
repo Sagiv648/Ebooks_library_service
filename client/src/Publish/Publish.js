@@ -13,6 +13,7 @@ import DropDown from 'react-bootstrap/Dropdown'
 import StorageClient from '../api/StorageClient'
 import {toast,ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
+import UploadDetails from './UploadDetails'
 
 const Publish = () => {
 
@@ -26,6 +27,10 @@ const Publish = () => {
   const [categories,setCategories] = useState([])
   const [selectedCategory, setSelectedCategory] = useState({name: "Select a category"})
   const [description,setBookDescription] = useState("")
+  const [uploadStart, setUploadStart] = useState(false)
+  const [uploadFinished, setUploadFinished] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState({})
+  const [uploadError, setUploadError] = useState("")
   const fetchCategories = async () => {
     const cats = await HttpClient.GetCategories();
     if(cats instanceof Error)
@@ -60,7 +65,26 @@ const Publish = () => {
       if(description)
         data.description = description
 
-      StorageClient.UploadEbook(data)
+      StorageClient.UploadEbook(data,
+        () => {
+          setUploadFinished(false)
+          setUploadStart(true)
+          setUploadProgress("0/100")
+      },
+      (progressData) => {
+        setUploadProgress(progressData)
+      },
+      () => {
+        console.log("finished here?");
+        setUploadFinished(true)
+        //setUploadStart(false)
+        setUploadProgress("")
+        clearFields()
+      }, 
+      (error) => {
+        setUploadError(error.message)
+      })
+      console.log("yeaaa?");
     }
     //const beganUpload = StorageClient.UploadEbook()
   }
@@ -140,12 +164,20 @@ filePickerRef.current.value = ""
 }
 
 const submit = async () => {
-  handleUpload(null)
+  handleUpload()
   //await uploadFileTesting();
 }
   return (
     <Container style={{margin: 10}}>
-      <ToastContainer/>
+      {
+        uploadStart &&
+        <UploadDetails 
+        uploadFinished={uploadFinished} 
+        
+        setUploadFinished={setUploadFinished} 
+        setUploadStart={setUploadStart}
+        uploadStart={uploadStart} bookName={bookName} progressData={uploadProgress} uploadError={uploadError}/>
+      }
       <Form style={{backgroundColor: 'azure', borderStyle: 'inset', borderRadius: 10}}>
       <Row>
         <Col style={{marginLeft: 10}}>

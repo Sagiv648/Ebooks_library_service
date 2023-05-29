@@ -65,6 +65,7 @@ const BookDisplayEntry = props => {
                     }
                     </Col>
                 </Row>
+                <Row>Downloads: {book.downloads_count}</Row>
                 
                
             

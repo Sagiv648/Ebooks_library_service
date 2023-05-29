@@ -45,3 +45,27 @@ export const emailTokenAuth = async (req,res,next) => {
         
     }
 }
+export const isRingZero = async (req,res,next) => {
+    const {privilege,id} = req.data;
+    try {
+        const user = await userModel.findById(id).select('privilege')
+        if(privilege !== user.privilege || privilege !== 0)
+            return res.status(403).json({error: "forbidden"})
+        next()
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
+    }
+}
+export const isPrivileged = async (req,res,next) => {
+
+    const {privilege,id} = req.data;
+    try {
+        const user = await userModel.findById(id).select('privilege')
+        if(privilege !== user.privilege || privilege === 2)
+            return res.status(403).json({error: "forbidden"})
+        next()
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
+    }
+
+}

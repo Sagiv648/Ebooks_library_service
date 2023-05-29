@@ -6,6 +6,7 @@ class HttpClient{
     static #token = null;
     static #authStateSubscribers = []
     static #profileChangeSubscribers = []
+    
     static #api =axios.create(
     {
     baseURL: "http://localhost:3001/api", 
@@ -270,6 +271,46 @@ class HttpClient{
             
         } catch (error) {
             return error;
+        }
+    }
+    static async EditProfile(data)
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            console.log(data);
+            const res = await this.#api.put('/user/', data, {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            console.log(res.data);
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            const strItem = localStorage.getItem("profile")
+            const item = JSON.parse(strItem)
+            const newItem = data
+            localStorage.setItem('profile', JSON.stringify(newItem))
+            this.#profileChangeSubscribers.forEach((entry) => entry.cb(res.data))
+            return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
+    static isPrivileged()
+    {
+        try {
+            const token = this.#GetToken();
+            if(!token)
+                return null;
+            const decoded = decodeToken(token);
+            console.log(decoded);
+
+            return this.isAuth() && decoded.privilege == 0
+            
+        } catch (error) {
+            
         }
     }
 }

@@ -20,7 +20,7 @@ router.get('/', async (req,res) => {
     
     try {
         const allBooksByQuery = await bookModel.find(query)
-        .populate({path: 'user', select: 'email avatar'})
+        .populate({path: 'user', select: 'username avatar'})
         .populate({path: 'category'})
         
         console.log(allBooksByQuery);
@@ -73,6 +73,33 @@ router.delete('/:bId', auth, async (req,res) => {
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({error: 'server error'})
+    }
+})
+
+
+//Potential use of SOCKET IO for real time downloads update
+router.put('/', auth, async (req,res) => {
+    const {id} = req.data;
+    const {downloaded_books} = req.body;
+    if(!downloaded_books)
+        return res.status(400).json({error: "invalid fields"})
+    try {
+        
+
+
+
+        downloaded_books.map(async (entry) => {
+            await bookModel.findByIdAndUpdate(entry, {$inc: {downloads_count: 1}})
+        })
+        const user = await userModel.findByIdAndUpdate(id, {$push: {downloaded_books: downloaded_books}})
+        if(!user)
+            return res.status(400).json({error: "invalid ids"})
+        
+        return res.status(200).json(downloaded_books)
+        
+    } catch (error) {
+        
+        return res.status(500).json({error: "server error"})
     }
 })
 

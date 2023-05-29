@@ -19,7 +19,8 @@ const SignUp = (props) => {
   const [passwordShwon, setPasswordShown] = useState(false)
   const [toastDisplay, setToastDisplay] = useState(false)
   const [error, setError] = useState("")
-
+  const [username,setUsername] = useState("")
+  const [description, setDescription] = useState("")
   const navigator = useNavigate()
   const viewSetter = props.viewSetter;
   const emailSentSetter = props.emailSentSetter
@@ -59,7 +60,7 @@ const SignUp = (props) => {
       
     }
     const hashed = crypt.SHA256(password).toString();
-    const res = await HttpClient.SignUp({email: email, password: hashed})
+    const res = await HttpClient.SignUp({email: email, password: hashed, username: username, description: description})
     console.log(res.message);
     if(res instanceof Error)
     {
@@ -123,6 +124,24 @@ const SignUp = (props) => {
             }}/>
         </Col>
         
+        </Row>
+        <Row>
+        <Form.Group>
+            
+            <Form.Label style={{fontSize: 'large'}}>Username</Form.Label>
+            <FormControl onChange={(e) => {
+              setUsername(e.target.value)
+            }} value={username} placeholder='Username...'/>
+          
+        </Form.Group>
+        <Form.Group>
+            
+            <Form.Label style={{fontSize: 'large'}}>Description</Form.Label>
+            <FormControl onChange={(e) => {
+              setDescription(e.target.value)
+            }} rows={4} as={'textarea'} maxLength={200} value={description} placeholder='Tell the community a little bit about yourself...'/>
+          
+        </Form.Group>
         </Row>
         
         
