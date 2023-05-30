@@ -20,16 +20,17 @@ import SearchResults from '../components/SearchResults'
 import BooksCollection from '../components/BooksCollection'
 import Spinner from 'react-bootstrap/esm/Spinner'
 import Marquee from 'react-fast-marquee'
-
+import { useLocation } from 'react-router-dom'
 const Home = () => {
-  
+  const location = useLocation();
   const [books, setAllBooks] = useState([])
   const [expandedBook, setExpandedBook] = useState({})
   const [search, setSearch] = useState(false)
   const [queriedBooks,setQueriedBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
   const [topFiveDownloads,setTopFiveDownloads]=useState([])
-  console.log(search);
+  const [downloadedBooks, setDownloadedBooks] = useState({})
+  
   const fetchAllBooks = async () => {
     setIsLoading(true)
      HttpClient.GetBooks().then((res) => {
@@ -76,7 +77,15 @@ const fetchCategories = async () => {
   useEffect(() => {
     fetchAllBooks();
     fetchCategories()
+    
+    
+
   },[])
+  
+
+  useEffect(() => {
+    HttpClient.PublishDownloadCountUpdates(downloadedBooks)
+  },[downloadedBooks])
 
   const nav = useNavigation();
   const [name, setName] = useState("")
@@ -84,7 +93,7 @@ const fetchCategories = async () => {
   const [selectedCategory, setSelectedCategory] = useState({name: "All"}) 
   const [categories, setCategories] = useState([{name: "All"}])
   const [exapnded,setExpanded] = useState(false)
-  
+  //console.log(downloadedBooks);
   const query = () => {
 
     
@@ -106,7 +115,7 @@ const fetchCategories = async () => {
             setSearch(false)
            }}>Clear</Button>
            <Row style={{fontSize: 30}}>Results:</Row>
-    <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={queriedBooks} />
+    <BooksCollection downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks} expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={queriedBooks} />
 
     </Container>
     :
@@ -152,7 +161,7 @@ const fetchCategories = async () => {
         <Container style={{alignSelf: 'center'}}>
         <Row style={{alignSelf: 'center'}}>
           <Marquee speed={50}>
-          {topFiveDownloads.map((entry) => (<BookDisplayEntry expandedBookSetter={setExpanded} book={entry}/>))}
+          {topFiveDownloads.map((entry) => (<BookDisplayEntry downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks} expandedBookSetter={setExpanded} book={entry}/>))}
           
           </Marquee>
         </Row>
@@ -169,7 +178,7 @@ const fetchCategories = async () => {
         <Container>
         {
         books.length !== 0 &&
-        <BooksCollection expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={books} />
+        <BooksCollection downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks} expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={books} />
         }
       </Container>)
        }

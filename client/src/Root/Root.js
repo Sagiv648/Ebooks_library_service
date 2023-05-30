@@ -30,6 +30,7 @@ const Root = () => {
  
   const [uploads, setUploads] = useState([])
   const [privileged, setPrivileged] = useState(false)
+  const [downloadedBooks,setDownloadedBooks] = useState({})
   const nav = useNavigate();
   const location = useLocation();
 
@@ -71,34 +72,38 @@ const Root = () => {
         setProfile(data)
       }})
     
-   
+      
+     
     return () => {
       HttpClient.UnsubscribeProfileChange("root")
+      
       
     }
   },[])
 
   
 
-  useLayoutEffect(() => {
+  // useLayoutEffect(() => {
     
-    if(isAuthRoute() && HttpClient.isAuth())
-    {
+  //   if(isAuthRoute() && HttpClient.isAuth())
+  //   {
       
-      nav('/', {replace: true})
+  //     nav('/', {replace: true})
       
-    }
-    else if(isProtectedRoute() && !HttpClient.isAuth())
-    {
+  //   }
+  //   else if(isProtectedRoute() && !HttpClient.isAuth())
+  //   {
       
-      nav('/auth', {replace: true, })
+  //     nav('/auth', {replace: true, })
       
-    }
-    else if(isPrivilegedRoute() && !HttpClient.isAuth())
-    {
-      nav('/', {replace: true})
-    }
-  },[location])
+  //   }
+  //   else if(isPrivilegedRoute() && !HttpClient.isAuth())
+  //   {
+  //     nav('/', {replace: true})
+  //   }
+    
+    
+  // },[location])
 
   useEffect(() => {
     
@@ -123,7 +128,19 @@ const Root = () => {
     if(HttpClient.isPrivileged())
       setPrivileged(true)
     
-   
+      if(location.pathname === '/')
+      {
+          HttpClient.SubscribeDownloadCountUpdate({id: 'root', cb: (updates) => {
+          setDownloadedBooks(updates)
+          console.log("we get the publishling");
+          console.log(updates);
+        }})
+      }
+      else
+      { 
+        HttpClient.UnsubscribeDownloadCountUpdate("root")
+      }
+      
     
   },[location])
 

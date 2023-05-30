@@ -16,6 +16,8 @@ const BookDisplayEntry = props => {
     const setUploadedBooks=props.setUploadedBooks
     const noExpand = props.noExpand;
     const deleteAble = props.deleteAble
+    const setDownloadedBooks=props.setDownloadedBooks
+    const downloadedBooks=props.downloadedBooks
     const deleteBook = async () => {
         const res = await HttpClient.DeleteBook(book)
         if(res instanceof Error)
@@ -29,7 +31,7 @@ const BookDisplayEntry = props => {
 
     }
     return (
-        <Card style={{width: 250,alignItems: 'center'}}>
+        <Card key={book._id} style={{width: 250,marginLeft: 10,alignItems: 'center'}}>
             <ToastContainer/>
             <Card.Img variant='top' style={{width: '75%', height: 200}} src={book.cover_image ? book.cover_image : '../default-cover.png'}/>
             <Card.Title>{book.name}</Card.Title>
@@ -52,6 +54,7 @@ const BookDisplayEntry = props => {
                     <Col style={{height: 100}}><Button onClick={() => {
                         window.open(book.download_url, book.name)
                         
+                        setDownloadedBooks({...downloadedBooks, [book._id]: 1})
                     }} variant='success'>Download</Button>
                     {deleteAble &&
                         <Row style={{marginTop: 5}}>

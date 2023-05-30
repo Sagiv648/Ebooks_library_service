@@ -13,7 +13,22 @@ class HttpClient{
     validateStatus : (code) => code >= 200
     })
 
-   
+    static #DownloadCountSubscribers = []
+
+
+    static SubscribeDownloadCountUpdate(data) 
+    {
+        this.#DownloadCountSubscribers.push(data)
+    }
+    static UnsubscribeDownloadCountUpdate(id)
+    {
+        
+        this.#DownloadCountSubscribers = this.#DownloadCountSubscribers.filter((entry) => entry.id !== id)
+    }
+    static PublishDownloadCountUpdates(data)
+    {
+        this.#DownloadCountSubscribers.forEach((entry) => entry.cb(data))
+    }
     static SubscribeAuthState(cb)
     {
         this.#authStateSubscribers.push(cb);

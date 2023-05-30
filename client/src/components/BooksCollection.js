@@ -7,6 +7,8 @@ const BooksCollection = props => {
     const [books,setBooks] = useState(props.books)
     const expandedBookSetter = props.expandedBookSetter
     const expansionSetter=props.expansionSetter
+    const setDownloadedBooks=props.setDownloadedBooks
+    const downloadedBooks=props.downloadedBooks
   return (
     
     <ListGroup style={{ marginTop: 30}}>
@@ -14,9 +16,9 @@ const BooksCollection = props => {
                 {
                   books.map((book, index) => {
                     return (
-                      <Col style={{marginBottom: 30}} key={index}>
+                      <Col style={{marginBottom: 30}} key={book._id}>
                       
-                      <BookDisplayEntry expandedBookSetter={expandedBookSetter} expansionSetter={expansionSetter} book={book}/>
+                      <BookDisplayEntry downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks}  expandedBookSetter={expandedBookSetter} expansionSetter={expansionSetter} book={book}/>
                   
                       </Col>
                     )
