@@ -65,26 +65,28 @@ const Publish = () => {
       if(description)
         data.description = description
 
-      StorageClient.UploadEbook(data,
-        () => {
-          setUploadFinished(false)
-          setUploadStart(true)
-          setUploadProgress("0/100")
-      },
-      (progressData) => {
-        setUploadProgress(progressData)
-      },
-      () => {
-        console.log("finished here?");
-        setUploadFinished(true)
-        //setUploadStart(false)
-        setUploadProgress("")
-        clearFields()
-      }, 
-      (error) => {
-        setUploadError(error.message)
-      })
-      console.log("yeaaa?");
+      StorageClient.UploadEbook2(data)
+
+      // StorageClient.UploadEbook(data,
+      //   () => {
+      //     setUploadFinished(false)
+      //     setUploadStart(true)
+      //     setUploadProgress("0/100")
+      // },
+      // (progressData) => {
+      //   setUploadProgress(progressData)
+      // },
+      // () => {
+      //   console.log("finished here?");
+      //   setUploadFinished(true)
+      //   //setUploadStart(false)
+      //   setUploadProgress("")
+      //   clearFields()
+      // }, 
+      // (error) => {
+      //   setUploadError(error.message)
+      // })
+      // console.log("yeaaa?");
     }
     //const beganUpload = StorageClient.UploadEbook()
   }

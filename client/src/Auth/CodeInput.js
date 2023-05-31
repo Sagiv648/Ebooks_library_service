@@ -24,7 +24,7 @@ const CodeInput = (props) => {
  
 
   const handleCodeInput = () => {
-
+    console.log(code);
     const parsed_code = code.join("")
 
     const res = HttpClient.CompareCodes(parsed_code)
@@ -44,7 +44,17 @@ const CodeInput = (props) => {
             {
               generateColsArr().map((val,ind) => {
                 return (
-                  <FormControl
+                  <FormControl onPaste={async (e) => {
+                    
+                    // const clipboardData = e.clipboardData.getData("text").split('')
+                    // console.log(clipboardData);
+                    // setCode(clipboardData.filter((val,ind) => ind <= 5))
+                    // clipboardData.map((val,ind) => {
+                    //   if(ind <= 5) 
+                    //   document.getElementById(`code-input-${ind+1}`).value = val})
+                    
+                    
+                  }}
                   className={`${ind}`}
                   onChange={(e) => {
                     if(code.length < ind)
