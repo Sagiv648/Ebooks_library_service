@@ -307,7 +307,7 @@ class HttpClient{
             if(!token)
                 throw new Error("invalid session")
             console.log(data);
-            const res = await this.#api.put('/user/', data, {
+            const res = await this.#api.put('/user/profile', data, {
                 headers: {
                     authorization: `Bearer ${token}`
                 }
@@ -332,7 +332,7 @@ class HttpClient{
             if(!token)
                 return null;
             const decoded = decodeToken(token);
-            console.log(decoded);
+            
 
             return this.isAuth() && decoded.privilege == 0
             
@@ -384,6 +384,23 @@ class HttpClient{
                     authorization: `Bearer ${token}`
                 }
             })
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
+    static async GetAllUsers()
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.get('/admin/users', {headers: {
+                authorization: `Bearer ${token}`
+            }})
+            console.log(res.data);
             if(res.status !== 200)
                 throw new Error(res.data.error)
             return res.data;

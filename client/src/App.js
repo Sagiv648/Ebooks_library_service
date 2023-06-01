@@ -12,7 +12,7 @@ import Auth from './Auth/Auth';
 import Uploads from './Uploads/Uploads';
 import Console from './Console/Console';
 import ErrorPage from './components/ErrorPage';
-import BookDisplayExpansion from './components/BookDisplayExpansion';
+import BookDisplayExpansion from './BookExpansion/BookDisplayExpansion';
 
 const router = createBrowserRouter([
   {

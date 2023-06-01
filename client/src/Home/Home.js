@@ -14,7 +14,6 @@ import ListGroup from 'react-bootstrap/ListGroup'
 //background color #9DA2AB
 import BookDisplayEntry from '../components/BookDisplayEntry'
 import Button from 'react-bootstrap/esm/Button'
-import BookDisplayExpansion from '../components/BookDisplayExpansion'
 import Marquee from 'react-fast-marquee'
 import { useLocation } from 'react-router-dom'
 const Home = () => {
@@ -143,7 +142,9 @@ const fetchCategories = async () => {
     <Container>
       <ToastContainer/>
       <Row>
-        <Col><FormLabel>Search by name:</FormLabel><FormControl value={name} style={{width: '60%'}} onChange={(e) => setName(e.target.value)} type='text'/></Col>
+        <Col>
+        <FormLabel>Search by name:</FormLabel>
+        <FormControl value={name} style={{width: '60%'}} onChange={(e) => setName(e.target.value)} type='text'/></Col>
         <Col>
         <FormLabel>Search by category:</FormLabel>
         <DropDown>
@@ -245,7 +246,7 @@ const fetchCategories = async () => {
     
     <Container>
     
-    <BookDisplayExpansion expandedBook={expandedBook} expansionSetter={setExpanded}/>
+    {/* <BookDisplayExpansion expandedBook={expandedBook} expansionSetter={setExpanded}/> */}
     </Container>
   )
 }

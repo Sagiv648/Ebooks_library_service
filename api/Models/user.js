@@ -3,7 +3,10 @@ import {Schema, model} from "mongoose";
 const schema = new Schema({
     email: String,
     password: String,
-    username: String,
+    username: {
+        type: String,
+        default: "N/A"
+    },
     privilege: {
         type: Number,
         default: 2
@@ -34,6 +37,10 @@ const schema = new Schema({
     upload_ban: {
         type: Boolean,
         default: false
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
     }
 })
 

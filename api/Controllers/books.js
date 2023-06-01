@@ -21,7 +21,7 @@ router.get('/', async (req,res) => {
     
     try {
         const allBooksByQuery = await bookModel.find(query)
-        .populate({path: 'user', select: 'username avatar'})
+        .populate({path: 'user', select: 'username avatar description'})
         .populate({path: 'category'})
         .select('-report_count')
         

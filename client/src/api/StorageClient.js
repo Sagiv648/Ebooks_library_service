@@ -140,7 +140,8 @@ class StorageClient{
         
         cbStart()
         uploadBytesResumable(ebooksRef, data.file,{contentType: "application/pdf"}).on('state_changed', (snapshot) => { 
-            cbProgress({name: data.file.name, progress: `${snapshot.bytesTransferred}/${snapshot.totalBytes}`})
+            cbProgress({name: data.file.name, progress: snapshot.bytesTransferred, size: snapshot.totalBytes})
+            //cbProgress({name: data.file.name, progress: `${snapshot.bytesTransferred}/${snapshot.totalBytes}`})
             //cbProgress({name: data.file.name, progress: `${(snapshot.bytesTransferred/snapshot.totalBytes).toFixed(0)*100}%`})
             
             

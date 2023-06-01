@@ -8,13 +8,14 @@ import Col from "react-bootstrap/esm/Col"
 import {  Link, useNavigate, useParams } from "react-router-dom"
 import { useLocation } from "react-router-dom"
 import HttpClient from "../api/HttpClient"
-import ErrorPage from "./ErrorPage"
+import ErrorPage from "../components/ErrorPage"
 import FormGroup from "react-bootstrap/esm/FormGroup"
 import Button from "react-bootstrap/esm/Button"
 import Spinner from "react-bootstrap/esm/Spinner"
 import {toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
-import ReviewEntry from "./ReviewEntry"
+import ReviewEntry from "../components/ReviewEntry"
+import UserProfileModal from "./UserProfileModal"
 
 
 
@@ -105,8 +106,10 @@ const [expandedBook, setExpandedBook] = useState(location.state)
                 expandedBook ?
                 <Container style={{marginTop: 10}}>
                     
-                    {userLinkClicked && 
-                    <>Whatever</>}
+                    {
+                    userLinkClicked && 
+                        <UserProfileModal setUserLinkClicked={setUserLinkClicked} user={expandedBook.book.user}/>
+                    }
                     {/* Book details row */}
                     <Row>
                         <Col lg={2}>
@@ -115,7 +118,7 @@ const [expandedBook, setExpandedBook] = useState(location.state)
                             
                         </Row>
                            <Button style={{ width: 100,marginTop: 5, marginBottom: 10,alignSelf: 'center'}} variant="success" onClick={(e) => {
-                                    window.open(expandedBook.download_url,expandedBook.name)
+                                    window.open(expandedBook.book.download_url,expandedBook.book.name)
                                 }}>Download</Button>
                               
                         </Col>
@@ -127,9 +130,13 @@ const [expandedBook, setExpandedBook] = useState(location.state)
                         <Row>{expandedBook.book.uploaded_at}</Row>
                         {
                             expandedBook.book.user.username &&
-                            <Row>Uploaded by:  <Link onClick={() => {
-                                setUserLinkClicked(!userLinkClicked)
-                            }}>{expandedBook.book.user.username}</Link></Row>
+                            <>
+                                <Row>Uploaded by:  {expandedBook.book.user.username}</Row>
+                            <Row><Button style={{marginTop: 5}} onClick={() => {
+                                setUserLinkClicked(true)
+                            }}>Show profile</Button></Row>
+                            </>
+                            
                         }
                         
                         </Col>
@@ -139,16 +146,7 @@ const [expandedBook, setExpandedBook] = useState(location.state)
                             
                         </Container>
                         </Col>
-                        {/* <Col lg={4}>
-                        <Row>
-                           Uploaded by: 
-                        </Row>
-                        <Row>
-                            <img style={{width: 200, height: 200}} src={expandedBook.book.user.avatar ? expandedBook.user.avatar : "../user.png"}/>
-
-                        </Row>
                         
-                        </Col> */}
                     </Row>
                     {/* Insert a new review row */}
                     
@@ -220,35 +218,6 @@ const [expandedBook, setExpandedBook] = useState(location.state)
         
     )
 
-    return (
-        <Container style={{justifyContent: 'center'}}>
-            <Modal show  onHide={() => {
-            expansion(false)
-            
-        }} >
-            <Modal.Header style={{alignSelf: 'center'}} >{expandedBook.name}</Modal.Header>
-           <img style={{width: 200, height: 200, alignSelf: 'center'}} src={expandedBook.cover_image ? expandedBook.cover_image : '../default-cover.png'}/>
-           <Modal.Title style={{alignSelf: 'center'}} >{expandedBook.name}</Modal.Title>
-           <Modal.Title style={{alignSelf: 'center'}}>{expandedBook.category.name}</Modal.Title>
-           {expandedBook.authors && <Modal.Title style={{alignSelf: 'center'}}>Authors: {expandedBook.authors}</Modal.Title>}
-           {
-               expandedBook.description &&
-               <Modal.Body style={{alignSelf: 'center'}}>
-                <FormControl style={{width: 400}} value={expandedBook.description} maxLength={1000} as={'textarea'} disabled rows={6}/>
-            
-                    
-               </Modal.Body>
-           }
-           
-           
-           
-           
-            
-        </Modal>
-          
-        </Container>
-        
-    )
 }
 
 export default BookDisplayExpansion

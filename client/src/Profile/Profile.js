@@ -83,11 +83,12 @@ const Profile = () => {
     const newProfile = await HttpClient.EditProfile(profile)
     if(newProfile instanceof Error)
     {
-      toast.error(`Error occured: ${newProfile.message}`)
+      toast.error(`Error occured`)
     }
     else
     {
       toast.success("Profile successfully updated.")
+      setProfile(newProfile)
       //setAvatar(picture)
       setNewAvatar("")
     }
@@ -108,7 +109,7 @@ const Profile = () => {
   return (
     
       <Container style={{backgroundColor: 'AppWorkspace',marginTop: 20,width: '80%',borderRadius: 25, borderStyle: 'outset',borderWidth: 1}} fluid>
-        <ToastContainer/>
+        
         <Row >
         <Col >
           <Row style={{justifyContent: 'center'}}>
@@ -205,8 +206,7 @@ const Profile = () => {
             setDescription(e.target.value)
           }} style={{marginBottom: 10, marginRight: 10}} rows={5} maxLength={200} as={'textarea'} value={description}/>
           </Row>
-        </Col>
-        {
+          {
           (profile && (username !== profile.username || description !== profile.description || profile.avatar !== avatar)) &&
            <Row style={{justifyContent: 'center', marginTop: 20, marginBottom: 10}}>
             <Button onClick={async () => {
@@ -214,6 +214,8 @@ const Profile = () => {
             }} variant='success' style={{width: '50%'}}>Save changes</Button>
           </Row>
         }
+        </Col>
+        
         
         </Row>
       
