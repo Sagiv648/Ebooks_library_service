@@ -81,4 +81,53 @@ adminRouter.delete('/categories', async (req,res) => {
     }
 })
 
+adminRouter.get('/books', async (req,res) => {
+
+    const {id} = req.data;
+
+    try {
+        const allBooks = await bookModel.find()
+        .populate({path: 'user', select: '-password'})
+        .populate({path: 'category'})
+
+        return res.status(200).json(allBooks)
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
+    }
+})
+
+adminRouter.delete('/books/:bookId', async (req,res) => {
+    const {bookId} = req.params;
+    if(!bookId)
+        return res.status(400).json({error: "invalid fields"})
+
+    const {id} = req.data;
+
+    try {
+        const bookRecord = await bookModel.findByIdAndDelete(bookId, {returnDocument: 'after'})
+        const userRecord = await userModel.findByIdAndUpdate(bookRecord.user, 
+            {$inc : {uploaded_books_count: -1}, 
+            $pull: {uploaded_books: bookRecord.id}}, {returnDocument: 'after'})
+        return res.status(200).json({removed: bookRecord})
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
+    }
+})
+
+//TODO: delete review
+adminRouter.delete('/reviews/:reviewId', async (req,res) => {
+
+    const {reviewId} = req.params;
+    if(!reviewId)
+        return res.status(400).json({error: "invalid fields"})
+
+    const {id} = req.data;
+
+    try {
+        
+    } catch (error) {
+        
+    }
+})
+
 export default adminRouter

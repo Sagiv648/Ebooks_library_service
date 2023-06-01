@@ -11,7 +11,7 @@ import axios from 'axios'
 import HttpClient from '../api/HttpClient'
 import DropDown from 'react-bootstrap/Dropdown'
 import StorageClient from '../api/StorageClient'
-import {toast,ToastContainer} from 'react-toastify'
+import {toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import UploadDetails from './UploadDetails'
 

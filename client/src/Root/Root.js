@@ -52,6 +52,10 @@ const Root = () => {
     return location.pathname === '/console'
   }
 
+  const isBookExpandedRoute = () => {
+    return location.pathname.startsWith('/book/')
+  }
+
   useEffect(() => {
     console.log("it renderes once no?");
     HttpClient.FetchStorage((profile) => {
@@ -83,30 +87,13 @@ const Root = () => {
 
   
 
-  // useLayoutEffect(() => {
+  useLayoutEffect(() => {
     
-  //   if(isAuthRoute() && HttpClient.isAuth())
-  //   {
-      
-  //     nav('/', {replace: true})
-      
-  //   }
-  //   else if(isProtectedRoute() && !HttpClient.isAuth())
-  //   {
-      
-  //     nav('/auth', {replace: true, })
-      
-  //   }
-  //   else if(isPrivilegedRoute() && !HttpClient.isAuth())
-  //   {
-  //     nav('/', {replace: true})
-  //   }
-    
-    
-  // },[location])
-
-  useEffect(() => {
-    
+    // if(isBookExpandedRoute() && location.state === null)
+    // {
+    //   console.log("does it get here?");
+    //   nav('/', {replace: true})
+    // } 
 
     if(isAuthRoute() && HttpClient.isAuth())
     {
@@ -117,6 +104,35 @@ const Root = () => {
     else if(isProtectedRoute() && !HttpClient.isAuth())
     {
       
+      nav('/auth', {replace: true, })
+      
+    }
+    else if(isPrivilegedRoute() && !HttpClient.isAuth())
+    {
+      nav('/', {replace: true})
+    }
+    
+    
+  },[location])
+
+  useEffect(() => {
+
+    // if(isBookExpandedRoute())
+    // {
+    //   console.log(location);
+    //   console.log("does it get here?");
+    //   nav('/', {replace: true})
+    // } 
+
+    if(isAuthRoute() && HttpClient.isAuth())
+    {
+      
+      nav('/', {replace: true})
+      
+    }
+    else if(isProtectedRoute() && !HttpClient.isAuth())
+    {
+      console.log("here");
       nav('/auth', {replace: true, })
       
     }

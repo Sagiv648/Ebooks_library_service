@@ -217,14 +217,26 @@ class HttpClient{
         }
     }
 
-    static async GetBooks()
+    static async GetBooks(bookId)
     {
         try {
-            const res = await this.#api.get('/books/')
-            if(res.status !== 200)
-                throw new Error(res.data.error)
+            if(bookId)
+            {
+                const res = await this.#api.get(`/books/${bookId}`)
+                    if(res.status !== 200)
+                        throw new Error(res.data.error)
+                return res.data;
+            }
+            else
+            {
+                const res = await this.#api.get('/books/')
+                    if(res.status !== 200)
+                        throw new Error(res.data.error)
+                return res.data;
+            }
+            
 
-            return res.data;
+            
         } catch (error) {
             
             return error;
@@ -326,6 +338,57 @@ class HttpClient{
             
         } catch (error) {
             
+        }
+    }
+    static async GetReviews(bookId) 
+    {
+        try {
+            
+            const res = await this.#api.get(`/reviews/${bookId}`)
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            return res.data.reviews
+        } catch (error) {
+            
+            return error;
+        }
+    }
+    static async PostReview(data)
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.post('/reviews/',data,
+            {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 201)
+                throw new Error(res.data.error)
+            return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
+    static async SubmitReviewReport(reviewId)
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.put(`/reviews/report/${reviewId}`,null,
+            {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            return res.data;
+        } catch (error) {
+            return error;
         }
     }
 }

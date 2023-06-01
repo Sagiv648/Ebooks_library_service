@@ -19,7 +19,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const Profile = () => {
   
   const [profile,setProfile] = useState(null)
-  
+  console.log("xxx");
   const [avatar,setAvatar] = useState("")
   const inputCoverRef = useRef();
   const [uploadedBooksCount, setUploadedBooksCount] = useState(0)
@@ -46,6 +46,7 @@ const Profile = () => {
     
     setIsLoading(true)
     HttpClient.GetUserBooks().then((res) => {
+      
       setUploadedBooks(res.uploaded_books)
       setUploadedBooksCount(res.uploaded_books_count)
       

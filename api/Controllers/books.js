@@ -2,6 +2,7 @@ import express from 'express'
 import userModel from '../Models/user.js';
 import bookModel from '../Models/book.js';
 import { auth } from './auth.js';
+import mongoose from 'mongoose';
 const router = express.Router();
 
 
@@ -22,8 +23,9 @@ router.get('/', async (req,res) => {
         const allBooksByQuery = await bookModel.find(query)
         .populate({path: 'user', select: 'username avatar'})
         .populate({path: 'category'})
+        .select('-report_count')
         
-        console.log(allBooksByQuery);
+        
         
         return res.status(200).json(allBooksByQuery)
     } 
@@ -38,18 +40,20 @@ router.get('/', async (req,res) => {
 
 router.get('/:bookId', async (req,res) => {
     const {bookId} = req.params;
-    
-    if(!bookId)
+    console.log("does it get here?");
+    if(!bookId || !mongoose.isValidObjectId(bookId))
         return res.status(400).json({error: "invalid fields"});
 
     try {
         const bookById = await bookModel.findById(bookId)
         .populate({path: 'user', select: 'email avatar'})
         .populate({path: 'category'})
+        .select('-report_count')
         .select('-__v')
         return res.status(200).json({book: bookById})
     } 
     catch (error) {
+        console.log(error.message);
         return res.status(500).json({error: "server error"})
     }
 
@@ -99,6 +103,27 @@ router.put('/', auth, async (req,res) => {
         
     } catch (error) {
         
+        return res.status(500).json({error: "server error"})
+    }
+})
+
+
+router.put('/report/:bookId', auth, async (req,res) => {
+    const {bookId} = req.params;
+
+    if(!bookId)
+        return res.status(400).json({error: "invalid fields"})
+
+    const {id} = req.data;
+
+    try {
+        const boookRecord = await bookModel.findByIdAndUpdate(bookId, {$inc: {report_count: 1}},{returnDocument: 'after'})
+        if(!boookRecord)
+            return res.status(400).json({error: "invalid id"})
+        return res.status(200).json({book: bookId})
+
+    } catch (error) {
+
         return res.status(500).json({error: "server error"})
     }
 })

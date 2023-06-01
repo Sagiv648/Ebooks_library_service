@@ -12,6 +12,7 @@ import Auth from './Auth/Auth';
 import Uploads from './Uploads/Uploads';
 import Console from './Console/Console';
 import ErrorPage from './components/ErrorPage';
+import BookDisplayExpansion from './components/BookDisplayExpansion';
 
 const router = createBrowserRouter([
   {
@@ -22,11 +23,15 @@ const router = createBrowserRouter([
       {
         
         index: true,
-        element: <Home/>
+        element: <Home/>,
+        
+        
+        
       },
       {
-        path: 'books',
-        element: <Books/>
+        path: 'book/:bookId',
+        element: <BookDisplayExpansion/>,
+        errorElement: <ErrorPage/>
       },
       {
         path: 'publish',
@@ -41,12 +46,12 @@ const router = createBrowserRouter([
         element: <Auth/>
       },
       {
-        path: 'uploads',
-        element: <Uploads/>
-      },
-      {
         path: 'console',
         element: <Console/>
+      },
+      {
+        path: '*',
+        element: <ErrorPage/>
       }
       
     

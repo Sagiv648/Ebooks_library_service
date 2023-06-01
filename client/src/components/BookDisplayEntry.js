@@ -7,7 +7,9 @@ import Row from 'react-bootstrap/esm/Row'
 import HttpClient from '../api/HttpClient'
 import {toast,ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom'
 const BookDisplayEntry = props => {
+    const nav = useNavigate()
     const [book, setBook] = useState(props.book)
     //console.log(props.book);
     const expansion = props.expansionSetter
@@ -45,8 +47,13 @@ const BookDisplayEntry = props => {
                     {
                         !noExpand &&
                         <Col style={{height: 100}}><Button onClick={() => {
-                            expansion(true)
-                            exapndedBookSetter(book)
+                            nav(`/book/${book._id}`, {
+                                state: {
+                                    book: book
+                                }
+                            })
+                            //expansion(true)
+                            //exapndedBookSetter(book)
                             
                         }}>Expand</Button></Col>
                     }

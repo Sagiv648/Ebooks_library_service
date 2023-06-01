@@ -26,6 +26,14 @@ const schema = new Schema({
     avatar: {
         type: String,
         default: ""
+    },
+    review_ban: {
+        type: Boolean,
+        default: false
+    },
+    upload_ban: {
+        type: Boolean,
+        default: false
     }
 })
 

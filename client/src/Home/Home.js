@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/esm/Col'
-import { useNavigation } from 'react-router-dom'
+import { useNavigate, useNavigation, useParams } from 'react-router-dom'
 import FormControl from 'react-bootstrap/FormControl'
 import FormLabel from 'react-bootstrap/esm/FormLabel'
 
@@ -11,17 +11,17 @@ import HttpClient from '../api/HttpClient'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import ListGroup from 'react-bootstrap/ListGroup'
-import ListGroupItem from 'react-bootstrap/esm/ListGroupItem'
 //background color #9DA2AB
 import BookDisplayEntry from '../components/BookDisplayEntry'
 import Button from 'react-bootstrap/esm/Button'
 import BookDisplayExpansion from '../components/BookDisplayExpansion'
-import SearchResults from '../components/SearchResults'
-import BooksCollection from '../components/BooksCollection'
-import Spinner from 'react-bootstrap/esm/Spinner'
 import Marquee from 'react-fast-marquee'
 import { useLocation } from 'react-router-dom'
 const Home = () => {
+
+  
+
+
   const location = useLocation();
   const [books, setAllBooks] = useState([])
   const [expandedBook, setExpandedBook] = useState({})
@@ -30,7 +30,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [topFiveDownloads,setTopFiveDownloads]=useState([])
   const [downloadedBooks, setDownloadedBooks] = useState({})
-  
+ 
   const fetchAllBooks = async () => {
     setIsLoading(true)
      HttpClient.GetBooks().then((res) => {
@@ -87,7 +87,7 @@ const fetchCategories = async () => {
     HttpClient.PublishDownloadCountUpdates(downloadedBooks)
   },[downloadedBooks])
 
-  const nav = useNavigation();
+  const nav = useNavigate();
   const [name, setName] = useState("")
   
   const [selectedCategory, setSelectedCategory] = useState({name: "All"}) 
@@ -112,10 +112,31 @@ const fetchCategories = async () => {
     search ?
     <Container>
     <Button onClick={() => {
+            
             setSearch(false)
            }}>Clear</Button>
            <Row style={{fontSize: 30}}>Results:</Row>
-    <BooksCollection downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks} expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={queriedBooks} />
+
+              <ListGroup style={{ marginTop: 30}}>
+                <Row>
+                {
+                  queriedBooks.map((book, index) => {
+                    return (
+                      <Col style={{marginBottom: 30}} key={book._id}>
+                      
+                      <BookDisplayEntry downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks}  expandedBookSetter={setExpandedBook} expansionSetter={setExpanded} book={book}/>
+                  
+                      </Col>
+                    )
+                  })
+                }
+                
+                </Row>
+                
+                
+                
+              </ListGroup>
+
 
     </Container>
     :
@@ -143,6 +164,7 @@ const fetchCategories = async () => {
         
           
             <Button style={{marginTop: 10, width: 200, height: 50}} onClick={() => {
+              
               if(name !== "" || selectedCategory.name !== 'All')
               {
                 query()
@@ -161,7 +183,12 @@ const fetchCategories = async () => {
         <Container style={{alignSelf: 'center'}}>
         <Row style={{alignSelf: 'center'}}>
           <Marquee speed={50}>
-          {topFiveDownloads.map((entry) => (<BookDisplayEntry downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks} expandedBookSetter={setExpanded} book={entry}/>))}
+          {topFiveDownloads.map((entry) => (<BookDisplayEntry 
+            downloadedBooks={downloadedBooks} 
+            setDownloadedBooks={setDownloadedBooks} 
+            expandedBookSetter={setExpandedBook} 
+            expansionSetter={setExpanded} 
+            book={entry}/>))}
           
           </Marquee>
         </Row>
@@ -178,7 +205,29 @@ const fetchCategories = async () => {
         <Container>
         {
         books.length !== 0 &&
-        <BooksCollection downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks} expansionSetter={setExpanded} expandedBookSetter={setExpandedBook} books={books} />
+        <ListGroup style={{ marginTop: 30}}>
+                <Row>
+                {
+                  books.map((book, index) => {
+                    return (
+                      <Col style={{marginBottom: 30}} key={book._id}>
+                      
+                      <BookDisplayEntry 
+                      downloadedBooks={downloadedBooks} 
+                      setDownloadedBooks={setDownloadedBooks}  
+                      expandedBookSetter={setExpandedBook} 
+                      expansionSetter={setExpanded} book={book}/>
+                  
+                      </Col>
+                    )
+                  })
+                }
+                
+                </Row>
+                
+                
+                
+              </ListGroup>
         }
       </Container>)
        }
@@ -194,9 +243,10 @@ const fetchCategories = async () => {
     </Container>
     : 
     
-    <>
+    <Container>
+    
     <BookDisplayExpansion expandedBook={expandedBook} expansionSetter={setExpanded}/>
-    </>
+    </Container>
   )
 }
 

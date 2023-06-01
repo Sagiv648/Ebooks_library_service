@@ -17,8 +17,16 @@ const schema = new Schema({
     authors: Array,
     description: String,
     publish_date: Date,
+    uploaded_at: {
+        type: Date,
+        default: Date.now
+    },
     cover_image: String,
-    download_url: String
+    download_url: String,
+    report_count: {
+        type: Number,
+        default: 0
+    }
 
 })
 
