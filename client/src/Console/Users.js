@@ -49,9 +49,7 @@ useEffect(() => {
 const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userName) && entry.email.includes(userEmail))
   return (
     
-            allUsersLoading ? 
-            <Row>Gathering items...</Row>
-            :
+           
             
             <Container style={{marginTop: 10}}>
                 <Container style={{marginBottom: 10}}>
@@ -99,7 +97,11 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                         
                     
                 </Container>
-                <Table>
+                {
+                    allUsersLoading ?  
+                    <Row>Gathering items...</Row>
+                    :
+                    <Table>
                     <thead>
                         <tr>
                             <th>Email</th>
@@ -179,6 +181,10 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                         }
                     </tbody>
                 </Table>
+                }
+                
+           
+                
             
             </Container>
   )

@@ -20,6 +20,7 @@ adminRouter.get('/users', async (req,res) => {
     }
 })
 
+
 adminRouter.put('/users/:userId', isRingZero ,async (req,res) => {
     const {id} = req.data;
     const {userId} = req.params;
@@ -55,8 +56,10 @@ adminRouter.post('/categories', async(req,res) => {
         
         if(!savedCategory)
             return res.status(500).json({error: "server error"})
-        return res.status(201).json({savedCategory})
+        
+        return res.status(201).json(savedCategory)
     } catch (error) {
+        console.log(error.message);
         return res.status(500).json({error: "server error"})
     }
 })

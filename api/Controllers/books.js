@@ -3,6 +3,7 @@ import userModel from '../Models/user.js';
 import bookModel from '../Models/book.js';
 import { auth } from './auth.js';
 import mongoose from 'mongoose';
+import categoryModel from '../Models/category.js';
 const router = express.Router();
 
 
@@ -169,6 +170,7 @@ router.post('/',auth ,async (req,res) => {
             
             
             const bookToReturn = await newBook.populate({path: 'category'})
+            const categoryRecord = await categoryModel.findByIdAndUpdate(category, {$inc: {books_count: 1}}, {returnDocument: 'after'})
             console.log(bookToReturn);
             return res.status(201).json({book: bookToReturn})
             

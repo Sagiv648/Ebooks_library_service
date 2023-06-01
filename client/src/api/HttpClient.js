@@ -408,5 +408,23 @@ class HttpClient{
             return error;
         }
     }
+    static async AppendCategory(name)
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.post('/admin/categories', {name: name}, {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 201)
+                throw new Error(res.data.error)
+            return res.data;
+        } catch (error) {
+            return error
+        }
+    }
 }
 export default HttpClient
