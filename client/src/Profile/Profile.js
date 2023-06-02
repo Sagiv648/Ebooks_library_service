@@ -14,13 +14,13 @@ import Spinner from 'react-bootstrap/esm/Spinner'
 import StorageClient from '../api/StorageClient'
 import {toast,ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
-
+import crypto from 'crypto-js'
 //TODO: Fix or remove features from the avatar upload
 const Profile = () => {
   
   const [profile,setProfile] = useState(null)
-  console.log("xxx");
-  const [avatar,setAvatar] = useState("")
+  
+  const [avatar,setAvatar] = useState(null)
   const inputCoverRef = useRef();
   const [uploadedBooksCount, setUploadedBooksCount] = useState(0)
   const [uploadedBooks, setUploadedBooks] = useState([])
@@ -34,7 +34,10 @@ const Profile = () => {
     if(profile)
     {
       setProfile(profile)
-      setAvatar(profile.avatar)
+      if(profile.avatar)
+        setAvatar(profile.avatar)
+      else
+        setAvatar("../user.png")
       setUsername(profile.username)
       setDescription(profile.description)
     }
@@ -53,7 +56,7 @@ const Profile = () => {
       setIsLoading(false)
     })
     .catch((err) => {
-      console.log(err.message);
+      
       setIsLoading(false)
     })
       
@@ -63,24 +66,39 @@ const Profile = () => {
   }
 
   const saveChanges = async ()=> {
-    var picture = avatar;
-    console.log("xx");
     
-    if(avatar != profile.avatar && avatar !== "" )
+    
+    console.log("xxx");
+    
+    if(avatar instanceof Blob )
     {
-      picture = await StorageClient.UploadAvatar({avatar: avatar, id: profile.id})
-      if(!picture)
+      const file_name = crypto.SHA256(`${profile.id}`)
+      //console.log("it's a blob");
+      const mime = avatar.name.split('.').slice(-1)
+      const image = await StorageClient.Upload(avatar, "avatars", `${file_name}.${mime}`,null,null,() => {
+        setProfile({...profile, avatar: image.download_url})
+        setAvatar(image.download_url)
+      })
+      //profile.avatar = await StorageClient.UploadAvatar({avatar: avatar, id: profile.id})
+      if(!image)
       {
         toast.error("Error occured while uploading the avatar")
         return;
       }
-
+      //console.log(image);
+      
+      
+      
+      //console.log(profile.avatar);
     }
-
-    profile.username = username;
-    profile.description = description;
-    profile.avatar = picture;
+    else if(avatar === '../user.png')
+      setProfile({...profile, avatar : ""})
+    setProfile({...profile, username: username, description: description})
+    
+    console.log(profile.email);
+    //setAvatar(profile.avatar ? profile.avatar : "../user.png")
     const newProfile = await HttpClient.EditProfile(profile)
+    
     if(newProfile instanceof Error)
     {
       toast.error(`Error occured`)
@@ -158,8 +176,7 @@ const Profile = () => {
             textAlign: 'center',
               height: 300,marginTop: 10 ,width: 200,
               
-            backgroundImage: `url(${profile && avatar !== profile.avatar && avatar ? URL.createObjectURL(avatar) 
-            : profile && profile.avatar && avatar === profile.avatar ? profile.avatar : '../user.png'})`}}>
+            backgroundImage: `url(${avatar instanceof Blob ? URL.createObjectURL(avatar) : avatar ? avatar : "../user.png" })`}}>
 
               
               <FormGroup>
@@ -169,7 +186,7 @@ const Profile = () => {
                 <FormControl onChange={(e) => {
                   if(e.target.files[0].type.split('/')[0] == 'image')
                     setAvatar(e.target.files[0])
-                    
+                    console.log(e.target.files[0] instanceof Blob);
                 }}  id='cover-file' ref={inputCoverRef} style={{visibility: 'hidden'}} type='file'/>
 
               </FormGroup>
@@ -179,11 +196,14 @@ const Profile = () => {
           <Row style={{justifyContent: 'center'}}> 
           <Button onClick={()=> {
             //setAvatar(profile.avatar)
-            setAvatar(profile.avatar)
+            if(profile.avatar)
+              setAvatar(profile.avatar)
+            else
+              setAvatar("../user.png")
           }} style={{ width: '20%',height: 60,marginTop: 10, marginRight: 10}}>Clear picked avatar</Button>
           <Button variant='secondary' onClick={()=> {
            
-            setAvatar("")
+            setAvatar("../user.png")
             
           }} style={{ width: '20%',height: 60,marginTop: 10}}>Set default avatar</Button>
           </Row>
@@ -207,9 +227,10 @@ const Profile = () => {
           }} style={{marginBottom: 10, marginRight: 10}} rows={5} maxLength={200} as={'textarea'} value={description}/>
           </Row>
           {
-          (profile && (username !== profile.username || description !== profile.description || profile.avatar !== avatar)) &&
+          (profile && (username !== profile.username || description !== profile.description || avatar instanceof Blob || (profile.avatar && avatar === '../user.png'))) &&
            <Row style={{justifyContent: 'center', marginTop: 20, marginBottom: 10}}>
             <Button onClick={async () => {
+              console.log("i see it i click it");
               await saveChanges()
             }} variant='success' style={{width: '50%'}}>Save changes</Button>
           </Row>

@@ -60,9 +60,15 @@ const Root = () => {
     await HttpClient.SubmitDownloadedBooksCount()
   }
 
+  const initStorage = async () => {
+    await StorageClient.InitializeStorage()
+  }
   useEffect(() => {
 
-    
+    if(HttpClient.isAuth())
+    {
+      initStorage()
+    }
 
     challenge(() => {
       if(HttpClient.isPrivileged())
@@ -71,13 +77,14 @@ const Root = () => {
 
     
     const item = localStorage.getItem("profile")
-    console.log(JSON.parse(item));
+    
     HttpClient.FetchStorage((profile) => {
       setProfile(profile);
     })
-    HttpClient.SubscribeAuthState((profile) => {
+    HttpClient.SubscribeAuthState(async (profile) => {
       if(profile)
       {
+        
         setProfile(profile)
         
       }
@@ -87,6 +94,7 @@ const Root = () => {
       }
       })
       HttpClient.SubscribeProfileChange({id: "root", cb: (data) => {
+        console.log("this is the callback");
         setProfile(data)
       }})
     

@@ -3,10 +3,10 @@ import app from './firebaseConfig';
 import crypt from 'crypto-js'
 import HttpClient from './HttpClient';
 import axios from 'axios';
-import { storageConfig } from './firebaseConfig';
+import storageConfig from './storageConfig';
 class StorageClient{
 
-
+    static #uploadToken = null
     static #api = axios.create({
         baseURL: storageConfig.base,
         validateStatus : (code) => code >= 200,
@@ -21,6 +21,28 @@ class StorageClient{
     static #uploadStartSubscribers = []
     static #uploadsCounter = 0
 
+    static async #init()
+    {
+        try {
+            const res = await this.#api.get('/storage')
+            if(res.status !== 201)
+                return null
+            
+            this.#uploadToken = res.data.upload_token
+            return res.data.upload_token
+        } catch (error) {
+            return null;
+        }
+    }
+    static async InitializeStorage()
+    {
+        console.log(this.#uploadToken);
+        if(!this.#uploadToken)
+        {
+            await this.#init()
+        }
+        console.log(this.#uploadToken);
+    }
     static SubscribeForProgress(cb,id)
     {
         this.#progressSubscribers.push({cb: cb, id: id});
@@ -51,6 +73,59 @@ class StorageClient{
         this.#uploadEndSubscribers = []
         this.#uploadStartSubscribers = []
     }
+
+    static async Upload(blob, path, name,cbStart,cbProgress,cbEnd,cbError)
+    {
+        
+        const formData = new FormData()
+        let start = 0;
+        formData.append("file", blob.slice(start,start + storageConfig.upload_size))
+        formData.append("start", start)
+        formData.append("path", path)
+        formData.append("name", name)
+        formData.append("size", blob.size)
+        if(cbStart)
+            cbStart()
+            try {
+                
+
+                for(; start < blob.size;)
+                {
+                    const res = await this.#api.post('/files/upload', formData, {
+                        headers: {
+                            authorization: `Bearer ${this.#uploadToken}`
+                        }
+                    })
+                    
+                    if(res.status === 201)
+                    {
+                        if(cbEnd)
+                            cbEnd(res.data)
+                        return res.data
+                    }
+                    else if(res.status === 200)
+                    {
+                        if(cbProgress)
+                            cbProgress(res.data)
+                        start += storageConfig.upload_size
+                        formData.set("file", blob.slice(start, start + storageConfig.upload_size))
+                        formData.set("start", start)
+                    }
+                    else
+                    {
+                        if(cbError)
+                            cbError(new Error(res.data.error))
+                        return new Error(res.data.error);
+                    }
+                    
+                }
+
+            } catch (error) {
+                
+            }
+        
+    }
+
     static async UploadAvatar(data) 
     {
         const avatar_name = crypt.SHA1(data.id).toString()

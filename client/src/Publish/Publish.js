@@ -14,6 +14,7 @@ import StorageClient from '../api/StorageClient'
 import {toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import UploadDetails from './UploadDetails'
+import crypto from 'crypto-js'
 
 const Publish = () => {
 
@@ -73,9 +74,18 @@ const Publish = () => {
     }
     else
     {
-      let data = {name: bookName, file: file, category: selectedCategory}
+      let data = {name: bookName, category: selectedCategory._id}
+      const upload_date = Date.now()
+      const userId = HttpClient.GetProfile().id
+      data.uploaded_at = upload_date
       if(coverImage)
-        data.cover = coverImage;
+      {
+        const mime = coverImage.name.split('.').slice(-1)
+        const fileName = crypto.SHA256(`${userId}_${upload_date}`).toString()
+        const res = await StorageClient.Upload(coverImage, "covers",fileName + `.${mime}`)
+        data.cover_image = res.download_url
+      }
+        
       if(bookPublishDate)
         data.publishDate = bookPublishDate;
       if(bookAuthors)
@@ -83,28 +93,65 @@ const Publish = () => {
       if(description)
         data.description = description
 
+        const mime = file.name.split('.').slice(-1)[0]
+      
       //StorageClient.UploadEbook2(data)
+      const book_file_name = crypto.SHA256(`${userId}_${upload_date}`).toString()
 
-      StorageClient.UploadEbook(data,
-        () => {
-          setUploadFinished(false)
-          setUploadStart(true)
-          setUploadProgress("0/100")
-      },
-      (progressData) => {
-        setUploadProgress(progressData)
-      },
-      () => {
-        console.log("finished here?");
-        setUploadFinished(true)
-        //setUploadStart(false)
-        setUploadProgress("")
-        clearFields()
-      }, 
-      (error) => {
-        setUploadError(error.message)
-      })
-      console.log("yeaaa?");
+      const book = await StorageClient.Upload(file, "ebooks",book_file_name + `.${mime}`, () => {
+        setUploadFinished(false)
+        setUploadStart(true)
+        setUploadProgress("0/100")
+    },
+    (progressData) => {
+      setUploadProgress(progressData)
+    },() => {
+      console.log("finished here?");
+      setUploadFinished(true)
+      //setUploadStart(false)
+      setUploadProgress("")
+      clearFields()
+    }, (error) => {
+      setUploadError(error.message)
+    })
+    if(book instanceof Error)
+    {
+      toast.error(`Upload failed with error ${res.message}`)
+      return;
+    }
+      data.download_url = book.download_url
+      //Ofcourse save data
+
+      // StorageClient.UploadEbook(data,
+      //   () => {
+      //     setUploadFinished(false)
+      //     setUploadStart(true)
+      //     setUploadProgress("0/100")
+      // },
+      // (progressData) => {
+      //   setUploadProgress(progressData)
+      // },
+      // () => {
+      //   console.log("finished here?");
+      //   setUploadFinished(true)
+      //   //setUploadStart(false)
+      //   setUploadProgress("")
+      //   clearFields()
+      // }, 
+      // (error) => {
+      //   setUploadError(error.message)
+      // })
+      // console.log("yeaaa?");
+
+
+      const res = await HttpClient.UploadBook(data)
+      if(res instanceof Error)
+      {
+        toast.error("Failed to add the book with error " + res.message)
+      }
+      else
+        toast.success(`Book named ${data.name} successfully added.`)
+
     }
     //const beganUpload = StorageClient.UploadEbook()
   }

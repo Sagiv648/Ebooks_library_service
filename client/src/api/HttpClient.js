@@ -39,6 +39,7 @@ class HttpClient{
     }
     static SubscribeProfileChange(data)
     {
+        console.log("sub");
         this.#profileChangeSubscribers.push(data)
     }
     static UnsubscribeProfileChange(id)
@@ -271,14 +272,14 @@ class HttpClient{
             const token = this.#GetToken();
             if(!token)
                 throw new Error("invalid session")
-            const res = await this.#api.post('/books/', {download_url: data.file, 
-                cover_image: data.cover,
+            const res = await this.#api.post('/books/', {download_url: data.download_url, 
+                cover_image: data.cover_image,
                 description: data.description,
                 authors: data.authors,
                 name: data.name,
                 category: data.category,
                 publish_date: data.publishDate,
-                uploaded_at: data.upload_date}, 
+                uploaded_at: data.uploaded_at}, 
                 {headers: {
                 authorization: `Bearer ${token}`
             }})
@@ -302,21 +303,25 @@ class HttpClient{
     {
         try {
             const token = this.#GetToken()
+            console.log(token);
             if(!token)
                 throw new Error("invalid session")
-            console.log(data);
+                console.log("hello?");
+            
             const res = await this.#api.put('/user/profile', data, {
                 headers: {
                     authorization: `Bearer ${token}`
                 }
             })
-            console.log(res.data);
+            console.log("yes?");
             if(res.status !== 200)
                 throw new Error(res.data.error)
             const strItem = localStorage.getItem("profile")
             const item = JSON.parse(strItem)
             const newItem = data
             localStorage.setItem('profile', JSON.stringify(newItem))
+            console.log("hello");
+            console.log(this.#profileChangeSubscribers);
             this.#profileChangeSubscribers.forEach((entry) => entry.cb(res.data))
             return res.data;
         } catch (error) {
@@ -537,8 +542,7 @@ class HttpClient{
                 })
                 if(res.status !== 200)
                     throw new Error(res.data.error)
-                console.log(res.data.token);
-                console.log(token);
+                
                 if(res.data.token != token)
                 {
                     localStorage.setItem("token", res.data.token)

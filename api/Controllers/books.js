@@ -136,7 +136,7 @@ router.post('/',auth ,async (req,res) => {
         description,
         publish_date,
         cover_image,
-        download_url} = req.body;
+        download_url,uploaded_at} = req.body;
         const {id} = req.data;
         if(!category || !name || !download_url)
             return res.status(400).json({error: "invalid fields"})
@@ -157,6 +157,7 @@ router.post('/',auth ,async (req,res) => {
                     publish_date: publish_date,
                     cover_image: cover_image,
                     download_url: download_url,
+                    uploaded_at: uploaded_at,
                     user: id
                 }
             )
