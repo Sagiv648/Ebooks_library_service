@@ -165,4 +165,8 @@ adminRouter.delete('/reviews/:reviewId', async (req,res) => {
     }
 })
 
+//TODO: get all reviews
+adminRouter.get('/reviews', async (req,res) => {
+    
+})
 export default adminRouter

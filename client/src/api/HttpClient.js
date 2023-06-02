@@ -385,13 +385,14 @@ class HttpClient{
             return error;
         }
     }
-    static async SubmitReviewReport(reviewId)
+    static async SubmitBookReport(bookId)
     {
         try {
             const token = this.#GetToken()
             if(!token)
                 throw new Error("invalid session")
-            const res = await this.#api.put(`/reviews/report/${reviewId}`,null,
+                console.log(bookId);
+            const res = await this.#api.put(`/books/report/${bookId}`,null,
             {
                 headers: {
                     authorization: `Bearer ${token}`

@@ -29,7 +29,7 @@ const ReviewEntry = props => {
                 <Row>
                      <Col lg={10}>
                      <FormControl  value={review && review.review_content} as={'textarea'} rows={4} maxLength={500} disabled readOnly/>
-                    <Button onClick={async (e) => {
+                    {/* <Button onClick={async (e) => {
                         if(!reportClicked)
                         {
                             setReportClicked(true)
@@ -37,7 +37,7 @@ const ReviewEntry = props => {
                         }
                             
 
-                    }} disabled={!auth ? true : reportClicked ? true:  false} variant='warning' style={{marginTop: 5}}>Report for an inappropriate review</Button>
+                    }} disabled={!auth ? true : reportClicked ? true:  false} variant='warning' style={{marginTop: 5}}>Report for an inappropriate review</Button> */}
                         Post date: {review.created_at}
                 </Col>
                 

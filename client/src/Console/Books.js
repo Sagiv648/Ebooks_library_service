@@ -12,6 +12,7 @@ import Button from 'react-bootstrap/esm/Button'
 import Spinner from 'react-bootstrap/Spinner'
 import Modal from 'react-bootstrap/Modal'
 import Dropdown from 'react-bootstrap/Dropdown'
+import {MdMore} from 'react-icons/md'
 
 const Books = () => {
 
@@ -20,6 +21,8 @@ const Books = () => {
   const [bookToDelete,setBookToDelete] = useState(null)
   const [deletionDialog,setDeletionDialog] = useState(false)
   const [bookDeletionLoading,setBookDeletionLoading] = useState(false)
+  const [expandedBook,setExpandedBook] = useState(null)
+  const [expanded,setExpanded] = useState(false)
   const fetchBooks = async () => {
     setBooksLoading(true)
     const res = await HttpClient.GetBooksUnfiltered()
@@ -57,7 +60,7 @@ const Books = () => {
   return (
     <Container>
       <Container>
-
+        {/*TODO: Search by category, name,upload date and sort as descending order by report count*/ }
       </Container>
 
       {
@@ -85,7 +88,32 @@ const Books = () => {
         </Modal.Body>
       </Modal>
       }
-
+      {
+        expanded &&
+        <Modal  show onHide={() => {
+          setExpandedBook(null)
+          setExpanded(false)
+        }}>
+          <Modal.Header>{expandedBook.name}</Modal.Header>
+          <Modal.Body >
+            <Row style={{justifyContent: 'center'}}>
+              <img style={{width: 200, height: 200}} src={expandedBook.cover_image ? expandedBook.cover_image : '../default-cover.png'}/>
+              
+            </Row>
+            <Row >
+              <h5>Category: {expandedBook.category.name}</h5>
+              <h5>Uploaded by: {expandedBook.user.email}</h5>
+              <h5>Authors: {expandedBook.authors}</h5>
+              <h5>Upload time: {expandedBook.uploaded_at}</h5>
+              <h5>Publish date: {expandedBook.published_at}</h5>
+              <h5>Downloads count: {expandedBook.downloads_count}</h5>
+            </Row>
+            <Row>
+              <FormControl disabled readOnly value={expandedBook.description} as={'textarea'} rows={5} maxLength={500}/>
+            </Row>
+          </Modal.Body>
+        </Modal>
+      }
 
       {
         booksLoading ?
@@ -119,8 +147,11 @@ const Books = () => {
             <td>{entry.uploaded_at}</td>
             <td>{entry.user.email}</td>
             <td>{entry.downloads_count}</td>
-            
             <td>{entry.report_count}</td>
+            <td><MdMore onClick={() => {
+              setExpandedBook(entry)
+              setExpanded(true)
+            }} cursor={'pointer'} size={30} color='blue'/></td>
             <td><FiDelete onClick={async () => {
                 setBookToDelete(entry)
                 setDeletionDialog(true)

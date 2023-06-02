@@ -53,22 +53,6 @@ reviewRouter.get('/:bookId', async (req,res) => {
     }
 })
 
-reviewRouter.put('/report/:reviewId',auth ,async (req,res) => {
-    const {reviewId} = req.params;
-    const {id} = req.data;
-    if(!reviewId)
-        return res.status(400).json({error: "invalid fields"})
-    
-    try {
-        const reviewRecord = await reviewModel.findByIdAndUpdate(reviewId, {$inc: {report_counts: 1}},{returnDocument :'after'})
-        if(!reviewRecord)
-            return res.status(400).json({error: "invalid review"})
-        return res.status(200).json({review: reviewId})
-    } catch (error) {
-        
-        return res.status(500).json({error: "server error"})
-    }
-})
 
 
 export default reviewRouter;

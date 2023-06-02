@@ -65,9 +65,7 @@ const Users = props => {
         }
     }
 
-    const saveChanges = async () => {
-        console.log("changes saved");
-    }
+    
     const disciplineUser = async () => {
         if(!disciplinedUser)
         {

@@ -33,6 +33,16 @@ const BookDisplayExpansion = props => {
     const [allReviews,setAllReviews] = useState([])
     const [allReviewsLoading, setAllReviewsLoading] = useState(false)
     const [permissions,setPermissions] = useState({})
+    const [reportClicked, setReportClicked] = useState(false)
+    const [expandedBook, setExpandedBook] = useState(location.state)
+    const reportBook = async () => {
+
+        const res = await HttpClient.SubmitBookReport(expandedBook.book._id)
+        if(res instanceof Error)
+            toast.error(`An error occured: ${res.message}`)
+        else
+            toast.success(`Report was submitted and the book will be checked`)
+    }
     const fetchUrlEnteredBook = async () => {
         const res = await HttpClient.GetBooks(bookId)
         if(res instanceof Error)
@@ -110,7 +120,7 @@ const BookDisplayExpansion = props => {
         
     },[])
 
-const [expandedBook, setExpandedBook] = useState(location.state)
+
     return (
         
             error ?
@@ -160,7 +170,15 @@ const [expandedBook, setExpandedBook] = useState(location.state)
                         <Col lg={8}>
                         <Container>
                             <FormControl as={'textarea'} disabled rows={6} value={expandedBook.book.description}/>
+                            <Button onClick={async (e) => {
+                        if(!reportClicked)
+                        {
+                            setReportClicked(true)
+                            await reportBook()
+                        }
                             
+
+                    }} disabled={!auth ? true : reportClicked ? true:  false} variant='warning' style={{marginTop: 5}}>Report for an inappropriate book</Button>
                         </Container>
                         </Col>
                         

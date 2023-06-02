@@ -187,4 +187,22 @@ router.post('/',auth ,async (req,res) => {
         
 })
 
+router.put('/report/:bookId',auth ,async (req,res) => {
+    const {bookId} = req.params;
+    const {id} = req.data;
+    console.log("x");
+    if(!bookId)
+        return res.status(400).json({error: "invalid fields"})
+    
+    try {
+        const bookRecord = await bookModel.findByIdAndUpdate(bookId, {$inc: {report_counts: 1}},{returnDocument :'after'})
+        if(!bookRecord)
+            return res.status(400).json({error: "invalid review"})
+        return res.status(200).json({book: bookId})
+    } catch (error) {
+        
+        return res.status(500).json({error: "server error"})
+    }
+})
+
 export default router;

@@ -22,7 +22,7 @@ import Tabs from 'react-bootstrap/Tabs'
 
 const Console = () => {
   const [page,setPage] = useState("users")
-  
+
   return (
     <Container>
       <Navbar style={{backgroundColor: 'ButtonFace',borderWidth: 2, borderStyle: 'outset', borderBottomRightRadius: 10, borderBottomLeftRadius: 10}}>
@@ -57,7 +57,7 @@ const Console = () => {
               </Nav.Item>
             </Nav.Link>
           </Col>
-          <Col>
+          {/* <Col>
             <Nav.Link onClick={() => {
               setPage("reviews")
             }}>
@@ -65,7 +65,7 @@ const Console = () => {
                 Reviews
               </Nav.Item>
             </Nav.Link>
-          </Col>
+          </Col> */}
 
         
          
