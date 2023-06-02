@@ -28,7 +28,7 @@ const Home = () => {
   const [queriedBooks,setQueriedBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
   const [topFiveDownloads,setTopFiveDownloads]=useState([])
-  const [downloadedBooks, setDownloadedBooks] = useState({})
+  const [downloadedBook, setDownloadedBook] = useState("")
  
   const fetchAllBooks = async () => {
     setIsLoading(true)
@@ -83,8 +83,8 @@ const fetchCategories = async () => {
   
 
   useEffect(() => {
-    HttpClient.PublishDownloadCountUpdates(downloadedBooks)
-  },[downloadedBooks])
+    HttpClient.PublishDownloadCountUpdates(downloadedBook)
+  },[downloadedBook])
 
   const nav = useNavigate();
   const [name, setName] = useState("")
@@ -104,7 +104,7 @@ const fetchCategories = async () => {
       setQueriedBooks(books.filter((book,index) => book.name.includes(name)))
     
   }
-  const qbooks = books.filter((book) => book.name.includes(name))
+  
   return (
     
     !exapnded ?
@@ -123,7 +123,7 @@ const fetchCategories = async () => {
                     return (
                       <Col style={{marginBottom: 30}} key={book._id}>
                       
-                      <BookDisplayEntry downloadedBooks={downloadedBooks} setDownloadedBooks={setDownloadedBooks}  expandedBookSetter={setExpandedBook} expansionSetter={setExpanded} book={book}/>
+                      <BookDisplayEntry downloadedBook={downloadedBook} setDownloadedBooks={setDownloadedBook}  expandedBookSetter={setExpandedBook} expansionSetter={setExpanded} book={book}/>
                   
                       </Col>
                     )
@@ -184,9 +184,9 @@ const fetchCategories = async () => {
         <Container style={{alignSelf: 'center'}}>
         <Row style={{alignSelf: 'center'}}>
           <Marquee speed={50}>
-          {topFiveDownloads.map((entry) => (<BookDisplayEntry 
-            downloadedBooks={downloadedBooks} 
-            setDownloadedBooks={setDownloadedBooks} 
+          {topFiveDownloads.map((entry) => (<BookDisplayEntry key={entry._id}
+            downloadedBook={downloadedBook} 
+            setDownloadedBook={setDownloadedBook} 
             expandedBookSetter={setExpandedBook} 
             expansionSetter={setExpanded} 
             book={entry}/>))}
@@ -214,8 +214,8 @@ const fetchCategories = async () => {
                       <Col style={{marginBottom: 30}} key={book._id}>
                       
                       <BookDisplayEntry 
-                      downloadedBooks={downloadedBooks} 
-                      setDownloadedBooks={setDownloadedBooks}  
+                      downloadedBook={downloadedBook} 
+                      setDownloadedBook={setDownloadedBook}  
                       expandedBookSetter={setExpandedBook} 
                       expansionSetter={setExpanded} book={book}/>
                   

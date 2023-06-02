@@ -85,9 +85,7 @@ router.post('/signin', async (req,res) => {
                 id: exists._id,
                 username: exists.username,
                 downloaded_books: exists.downloaded_books,
-                description: exists.description,
-                uploaded_books: exists.uploaded_books,
-                uploaded_books_count: exists.uploaded_books_count},token: token})
+                description: exists.description},token: token})
         }
         else
             return res.status(500).json({error: "server error"})

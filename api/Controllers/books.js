@@ -205,4 +205,20 @@ router.put('/report/:bookId',auth ,async (req,res) => {
     }
 })
 
+router.put('/downloads',auth, async (req,res) => {
+    const {id} = req.data;
+    const {bookIds} = req.body;
+
+    if(!bookIds || bookIds.length === 0)
+        return res.status(400).json({error: "invalid fields"})
+    try {
+        const userRecord = await userModel.findByIdAndUpdate(id, {$push: {downloaded_books: bookIds}}, {returnDocument: 'after'})
+        bookIds.forEach(async (entry) => await bookModel.findByIdAndUpdate(entry, {$inc: {downloads_count: 1}}, {returnDocument: 'after'}))
+        return res.status(200).json({books: bookIds})
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({error: "server error"})
+    }
+})
+
 export default router;

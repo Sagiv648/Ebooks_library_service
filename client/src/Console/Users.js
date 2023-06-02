@@ -221,7 +221,7 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                         {
                              allUsersQuery.length !== 0 &&
                             allUsersQuery.map((entry,index) => {
-                                return (<tr >
+                                return (<tr key={entry._id} >
                                     
                                     
                                     <td>{entry.email}</td>

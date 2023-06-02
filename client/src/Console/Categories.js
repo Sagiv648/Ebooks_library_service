@@ -168,7 +168,7 @@ const Categories = () => {
           <tbody>
             {queriedCategories.length !== 0 &&
               queriedCategories.map((entry) => {
-                return (<tr>
+                return (<tr key={entry._id}>
                   <td>{entry._id}</td>
                   <td>{entry.name}</td>
                   <td>{entry.books_count}</td>

@@ -52,13 +52,13 @@ const Root = () => {
     return location.pathname === '/console'
   }
 
-  const isBookExpandedRoute = () => {
-    return location.pathname.startsWith('/book/')
-  }
   const challenge = async (cb) => {
     await HttpClient.ChallengeToken(cb)
   }
 
+  const updateDownloadsCounts = async () => {
+    await HttpClient.SubmitDownloadedBooksCount()
+  }
 
   useEffect(() => {
 
@@ -100,7 +100,7 @@ const Root = () => {
   },[])
 
   
-
+  
   useLayoutEffect(() => {
     if(HttpClient.isPrivileged())
         setPrivileged(true)
@@ -158,16 +158,18 @@ const Root = () => {
 
   
     
-      if(location.pathname === '/')
+      if(location.pathname === '/' && HttpClient.isAuth())
       {
-          HttpClient.SubscribeDownloadCountUpdate({id: 'root', cb: (updates) => {
-          setDownloadedBooks(updates)
-          console.log("we get the publishling");
-          console.log(updates);
+          HttpClient.SubscribeDownloadCountUpdate({id: 'root', cb: (update) => {
+           
+          HttpClient.AppendDownloadedBookToSet(update)
+          
+          
         }})
       }
-      else
-      { 
+      else if(location.pathname !== '/' && HttpClient.isAuth())
+      { console.log("gets here?");
+        updateDownloadsCounts()
         HttpClient.UnsubscribeDownloadCountUpdate("root")
       }
       

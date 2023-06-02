@@ -18,8 +18,8 @@ const BookDisplayEntry = props => {
     const setUploadedBooks=props.setUploadedBooks
     const noExpand = props.noExpand;
     const deleteAble = props.deleteAble
-    const setDownloadedBooks=props.setDownloadedBooks
-    const downloadedBooks=props.downloadedBooks
+    const setDownloadedBook=props.setDownloadedBook
+    const downloadedBook=props.downloadedBook
     const deleteBook = async () => {
         const res = await HttpClient.DeleteBook(book)
         if(res instanceof Error)
@@ -61,7 +61,7 @@ const BookDisplayEntry = props => {
                     <Col style={{height: 100}}><Button onClick={() => {
                         window.open(book.download_url, book.name)
                         
-                        setDownloadedBooks({...downloadedBooks, [book._id]: 1})
+                        setDownloadedBook(book._id)
                     }} variant='success'>Download</Button>
                     {deleteAble &&
                         <Row style={{marginTop: 5}}>

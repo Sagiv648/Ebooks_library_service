@@ -6,7 +6,7 @@ class HttpClient{
     static #token = null;
     static #authStateSubscribers = []
     static #profileChangeSubscribers = []
-    
+    static #downloaded_books_set = new Set()
     static #api =axios.create(
     {
     baseURL: "http://localhost:3001/api", 
@@ -553,7 +553,7 @@ class HttpClient{
     static async DisciplineUser(data)
     {
         try {
-            const token = this.GetToken()
+            const token = this.#GetToken()
             if(!token)
                 throw new Error("invalid session")
             const res = await this.#api.put(`/admin/user/action/${data.userId}?action=${data.action}`,null, {
@@ -571,7 +571,7 @@ class HttpClient{
     static async GetPermissions()
     {
         try {
-            const token = this.GetToken()
+            const token = this.#GetToken()
             if(!token)
                 throw new Error("invalid session")
             const res = await this.#api.get('/user/permissions', {
@@ -582,6 +582,43 @@ class HttpClient{
             if(res.status !== 200)
                 throw new Error(res.data.error)
             return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
+    static AppendDownloadedBookToSet(bookId)
+    {
+        const jsItem = localStorage.getItem("profile")
+        const item = JSON.parse(jsItem)
+        console.log(item.downloaded_books);
+        if(item.downloaded_books.filter((entry) => entry === bookId).length === 0)
+            this.#downloaded_books_set.add(bookId)
+    }
+    static async SubmitDownloadedBooksCount()
+    {
+        try {
+            console.log("even gets here?");
+            console.log(this.#downloaded_books_set);
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            const bookIds = Array.from(this.#downloaded_books_set)
+            if(bookIds.length !== 0)
+            {
+                const res = await this.#api.put(`/books/downloads`, {bookIds: bookIds}, {
+                    headers: {
+                        authorization: `Bearer ${token}`
+                    }
+                })
+                if(res.status !== 200)
+                    throw new Error(res.data.error)
+                const jsItem = localStorage.getItem("profile")
+                const item = JSON.parse(jsItem)
+                item.downloaded_books = item.downloaded_books.concat(bookIds)
+                localStorage.setItem("profile", JSON.stringify(item))
+                this.#downloaded_books_set.clear()
+                return bookIds
+            }
         } catch (error) {
             return error;
         }
