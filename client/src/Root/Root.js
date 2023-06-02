@@ -55,9 +55,23 @@ const Root = () => {
   const isBookExpandedRoute = () => {
     return location.pathname.startsWith('/book/')
   }
+  const challenge = async (cb) => {
+    await HttpClient.ChallengeToken(cb)
+  }
+
 
   useEffect(() => {
-    console.log("it renderes once no?");
+
+    
+
+    challenge(() => {
+      if(HttpClient.isPrivileged())
+        setPrivileged(true)
+    })
+
+    
+    const item = localStorage.getItem("profile")
+    console.log(JSON.parse(item));
     HttpClient.FetchStorage((profile) => {
       setProfile(profile);
     })
@@ -88,7 +102,8 @@ const Root = () => {
   
 
   useLayoutEffect(() => {
-    
+    if(HttpClient.isPrivileged())
+        setPrivileged(true)
     // if(isBookExpandedRoute() && location.state === null)
     // {
     //   console.log("does it get here?");
@@ -141,8 +156,7 @@ const Root = () => {
       nav('/', {replace: true})
     }
 
-    if(HttpClient.isPrivileged())
-      setPrivileged(true)
+  
     
       if(location.pathname === '/')
       {
@@ -232,7 +246,7 @@ const Root = () => {
         operationProgress && (<Navbar.Brand>{operationProgress}</Navbar.Brand>)
         } */}
           
-          <ToastContainer/>
+          
       </Container>
       
           

@@ -141,6 +141,16 @@ router.post('/reset', async (req,res) => {
     }
 })
 
+router.get('/permissions', auth, async (req,res) => {
+    const {id} = req.data;
+
+    try {
+        const userRecord = await userModel.findById(id)
+        return res.status(200).json({review_ban: userRecord.review_ban, upload_ban: userRecord.upload_ban})
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
+    }
+})
 
 
 router.put('/profile', auth, async (req,res) => {
@@ -200,6 +210,34 @@ router.get('/books', auth, async (req,res) => {
     } 
     catch (error) {
         return res.status(500).json({error: error.message})
+    }
+})
+
+router.get('/challenge', async (req,res) => {
+
+    if(!req.headers.authorization || !req.headers.authorization.startsWith("Bearer "))
+        return res.status(401).json({error: "unauthorized"})
+    const authorization = req.headers.authorization.split(' ')
+    
+    if(authorization.length != 2)
+        return res.status(401).json({error: "unauthorized"})
+
+    try {
+        jwt.verify(authorization[1], process.env.KEY, async (err, payload) => {
+            if(err)
+                return res.status(401).json({error: "unauthorized"})
+
+            const exists = await userModel.findById(payload.id)
+            if(!exists)
+                return res.status(401).json({error: "unauthorized"})
+            if(exists.privilege === payload.privilege)
+                return res.status(200).json({token: authorization[1]})
+            const newPayload = {id: payload.id, privilege: exists.privilege}
+            const newToken = jwt.sign(newPayload,process.env.KEY)
+            return res.status(200).json({token: newToken})
+        })
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
     }
 })
 

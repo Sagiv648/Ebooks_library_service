@@ -74,7 +74,8 @@ class StorageClient{
         const parsed = JSON.parse(item)
         const uploadIndex = this.#uploadsCounter
         this.#uploadsCounter++;
-        const ebook_uploaded_name = crypt.SHA1(`${parsed.id}_${parsed.uploaded_books_count + 1}`).toString();
+        const uploaded_now = Date.now()
+        const ebook_uploaded_name = crypt.SHA1(`${parsed.id}_${uploaded_now}`).toString();
         let coverMime = ""
         if(data.cover)
         coverMime = data.cover.name.split('.').slice(-1)
@@ -122,6 +123,10 @@ class StorageClient{
         
 
 
+    }
+    static DeleteEbook(data)
+    {
+        //TODO: Delete
     }
     static UploadEbook(data, cbStart, cbProgress, cbFinished,cbError)
     {

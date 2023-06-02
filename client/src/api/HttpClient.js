@@ -48,7 +48,7 @@ class HttpClient{
     static async GetCategories() {
         
         try {
-            const token = this.#GetToken();
+            //const token = this.#GetToken();
             const res = await this.#api.get('/categories/')
             
             if(res.status !== 200)
@@ -62,7 +62,7 @@ class HttpClient{
     {
         try {
             const res = await this.#api.post("/user/signup", data)
-            if(res.status != 200)
+            if(res.status !== 200)
                 throw new Error(res.data.error)
 
             return res.data;
@@ -76,7 +76,7 @@ class HttpClient{
         try {
             const res = await this.#api.post("/user/signin", data)
             
-            if(res.status != 200)
+            if(res.status !== 200)
                 throw new Error(res.data.error)
             console.log(res.data);
             this.#token = res.data.token;
@@ -118,10 +118,7 @@ class HttpClient{
         }
     }
 
-    static SetToken(token)
-    {
-        this.#token = token;
-    }
+    
     static isAuth()
     {
         const item = localStorage.getItem("token")
@@ -280,7 +277,8 @@ class HttpClient{
                 authors: data.authors,
                 name: data.name,
                 category: data.category,
-                publish_date: data.publishDate}, 
+                publish_date: data.publishDate,
+                uploaded_at: data.upload_date}, 
                 {headers: {
                 authorization: `Bearer ${token}`
             }})
@@ -334,7 +332,22 @@ class HttpClient{
             const decoded = decodeToken(token);
             
 
-            return this.isAuth() && decoded.privilege == 0
+            return this.isAuth() && (decoded.privilege === 1 || decoded.privilege === 0)
+            
+        } catch (error) {
+            
+        }
+    }
+    static isRingZero()
+    {
+        try {
+            const token = this.#GetToken();
+            if(!token)
+                return null;
+            const decoded = decodeToken(token);
+            
+
+            return this.isAuth() && decoded.privilege === 0
             
         } catch (error) {
             
@@ -400,7 +413,7 @@ class HttpClient{
             const res = await this.#api.get('/admin/users', {headers: {
                 authorization: `Bearer ${token}`
             }})
-            console.log(res.data);
+            
             if(res.status !== 200)
                 throw new Error(res.data.error)
             return res.data;
@@ -424,6 +437,152 @@ class HttpClient{
             return res.data;
         } catch (error) {
             return error
+        }
+    }
+    static async DeleteAndReplaceCategory(data)
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.delete(`/admin/categories?removed_category=${data.removed_category}&replacement_category=${data.replacement_category}`,
+            {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
+    static async GetBooksUnfiltered()
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            
+            const res = await this.#api.get('/admin/books/', {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+                if(res.status !== 200)
+                    throw new Error(res.data.error)
+            return res.data;
+            
+            
+
+            
+        } catch (error) {
+            
+            return error;
+        }
+    }
+    
+    static async DeleteBookAdmin(bookId)
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            
+            const res = await this.#api.delete(`/admin/books/${bookId}`, {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+
+            return res.data
+        } catch (error) {
+            return error;
+        }
+    }
+
+    static async EditPermissions(data)
+    {
+        try {
+            const token = this.#GetToken()
+            if(!token || !this.isRingZero())
+                throw new Error("invalid session")
+            const res = await this.#api.put(`/admin/users/${data.userId}?level=${data.level}`,null,{
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            return res.data;
+            
+        } catch (error) {
+            return error;
+        }
+    }
+    static async ChallengeToken(cb)
+    {
+        try {
+            const token = this.#GetToken()
+            if(token)
+            {
+                const res = await this.#api.get('/user/challenge', {
+                    headers: {
+                        authorization: `Bearer ${token}`
+                    }
+                })
+                if(res.status !== 200)
+                    throw new Error(res.data.error)
+                console.log(res.data.token);
+                console.log(token);
+                if(res.data.token != token)
+                {
+                    localStorage.setItem("token", res.data.token)
+
+                }
+                cb()
+            }
+        } catch (error) {
+            return error;
+        }
+    }
+    static async DisciplineUser(data)
+    {
+        try {
+            const token = this.GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.put(`/admin/user/action/${data.userId}?action=${data.action}`,null, {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            return res.data;
+        } catch (error) {
+            return error;
+        }
+    }
+    static async GetPermissions()
+    {
+        try {
+            const token = this.GetToken()
+            if(!token)
+                throw new Error("invalid session")
+            const res = await this.#api.get('/user/permissions', {
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+            if(res.status !== 200)
+                throw new Error(res.data.error)
+            return res.data;
+        } catch (error) {
+            return error;
         }
     }
 }

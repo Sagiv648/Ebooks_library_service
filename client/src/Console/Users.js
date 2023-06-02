@@ -8,19 +8,23 @@ import Row from 'react-bootstrap/esm/Row'
 import Col from 'react-bootstrap/esm/Col'
 import FormControl from 'react-bootstrap/FormControl'
 import Button from 'react-bootstrap/esm/Button'
-
+import {FaLevelUpAlt, FaLevelDownAlt} from 'react-icons/fa'
+import ModalDialog from 'react-bootstrap/esm/ModalDialog'
+import Modal from 'react-bootstrap/Modal'
+import Spinner from 'react-bootstrap/esm/Spinner'
 const Users = props => {
 
     const [allUsers, setAllUsers] = useState([])
     const [allUsersLoading, setAllUsersLoading] = useState(false)
     const [userEmail, setUserEmail] = useState("")
     const [userName, setUserName] = useState("")
-    const [initalReviewBanned,setInitialReviewBanned] = useState([])
-    const [initalUploadBanned,setInitalUploadBanned] = useState([])
-    const [newReviewBanned, setNewReviewBanned] = useState([])
-    const [newUploadBanned, setNewUploadBanned] = useState([])
-    const [newReviewUnbanned,setNewReviewUnbanned] = useState([])
-    const [newUploadUnbanned,setNewUploadUnbanned] = useState([])
+    
+    const [permissionsElevationDialog,setPermissionElevationDialog] = useState("")
+    const [userElevation, setUserElevation] = useState(null)
+    const [userDisciplineryActionDialog,setUserDiciplineryActionDialog] = useState("")
+    const [elevationPermissionLoader,setElevationPermissionLoader] = useState(false)
+    const [disciplinedUser,setDisciplinedUser] = useState(null)
+    const [disciplineUserLoader,setDisciplineUserLoader] = useState(false)
     const fetchAllUsers = async () => {
         setAllUsersLoading(true)
         const res = await HttpClient.GetAllUsers()
@@ -31,19 +35,62 @@ const Users = props => {
         {
             setAllUsers(res)
             
-            setInitialReviewBanned(res.filter((entry) => entry.review_ban))
-            setInitalUploadBanned(res.filter((entry) => entry.upload_ban))
+            
             
         }
             
         setAllUsersLoading(false)
     }
 
+    const editPermissions = async () => {
+        if(!userElevation)
+        {
+            toast.error("No user chosen")
+            return;
+        }
+        
+        setElevationPermissionLoader(true)
+        console.log(userElevation);
+        const res = await HttpClient.EditPermissions({userId: userElevation._id, level: permissionsElevationDialog === "UP" ? 1 : 2})
+        if(res instanceof Error)
+            toast.error("Error occured with permissions editing " + res.message)
+        else
+        {
+            setAllUsers(allUsers.map((entry) => entry._id === userElevation._id ? {...entry, privilege: permissionsElevationDialog === "UP" ? 1 : 2} : entry))
+            setElevationPermissionLoader(false)
+            setPermissionElevationDialog("")
+            
+            toast.success(`Permissions of user with email ${userElevation.email} was successfully changed.`)
+            setUserElevation(null)
+        }
+    }
+
     const saveChanges = async () => {
         console.log("changes saved");
     }
+    const disciplineUser = async () => {
+        if(!disciplinedUser)
+        {
+            toast.error("No user chosen")
+            return;
+        }
+        setDisciplineUserLoader(true)
+        const res = await HttpClient.DisciplineUser({userId: disciplinedUser._id, action: userDisciplineryActionDialog})
+        if(res instanceof Error)
+            toast.error(`Error occured with the disciplinary action ${res.message}`)
+        else
+        {
+            setAllUsers(allUsers.map((entry) => entry._id === disciplinedUser._id ? res : entry))
+            setDisciplinedUser(null)
+            setUserDiciplineryActionDialog("")
+            toast.success(`Action has been on user with email ${res.email}`)
+        }
+        setDisciplineUserLoader(false)
+
+    }
     
 useEffect(() => {
+    
     fetchAllUsers()
 },[])
 const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userName) && entry.email.includes(userEmail))
@@ -81,18 +128,70 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                         </Col>
                     </Row>
                         </Col>
-                        {
-                            newReviewBanned.length !== 0 && newUploadBanned.length !== 0 && (newReviewBanned.length !== initalReviewBanned.length || newUploadBanned.length !== initalUploadBanned) &&
-                            <Col lg={1}>
-                                <Button onClick={async () => {
-                                    await saveChanges()
-                                }} size='bg' variant='warning'>Save changes</Button>
-                            </Col>
-                        }
+                       
                         
                     </Row>
                     
-                    
+                    {
+                        permissionsElevationDialog &&
+                        <Modal show onHide={() => {
+                            setPermissionElevationDialog("")
+                            setUserElevation(null)
+                        }}>
+                            {
+                                permissionsElevationDialog === "UP" ?
+                                <Modal.Header>Elevate permissions for user with email: {userElevation.email}</Modal.Header>
+                                :
+                                <Modal.Header>Remove permissions for user with email: {userElevation.email}</Modal.Header>
+                            }
+                            <Modal.Body>
+                                <Button onClick={async () => {
+                                    await editPermissions()
+                                }} variant='success'>Yes</Button>
+                                {
+                                    elevationPermissionLoader && <Spinner size='large'/>
+                                }
+                                
+                                <Button onClick={() => {
+                                    setUserElevation(null)
+                                    setPermissionElevationDialog("")
+                                }} variant='danger'>No</Button>
+                            </Modal.Body>
+                            
+                        </Modal>
+                    }
+                    {
+                        userDisciplineryActionDialog &&
+                        <Modal show onHide={() => {
+                            setUserDiciplineryActionDialog("")
+                            setDisciplinedUser(null)
+                        }}>
+                            {
+                                userDisciplineryActionDialog === "REVIEW BAN" ?
+                                <Modal.Header>Do you wish to ban user with email {disciplinedUser.email} from posting reviews?</Modal.Header> 
+                                : userDisciplineryActionDialog === "REVIEW UNBAN" ?
+                                <Modal.Header>Do you wish to allow user with email {disciplinedUser.email} to post reviews?</Modal.Header> 
+                                : userDisciplineryActionDialog === "UPLOAD BAN" ?
+                                <Modal.Header>Do you wish to ban user with email {disciplinedUser.email} from uploading books?</Modal.Header>
+                                : userDisciplineryActionDialog === "UPLOAD UNBAN" ?
+                                <Modal.Header>Do you wish to allow user with email {disciplinedUser.email} to upload books?</Modal.Header> 
+                                : <></>
+                            }
+                            <Modal.Body>
+                                <Button onClick={async () => {
+                                    await disciplineUser()
+                                }} variant='success'>Yes</Button>
+                                {
+                                    disciplineUserLoader && <Spinner size='large'/>
+                                }
+                                
+                                <Button onClick={() => {
+                                    setUserDiciplineryActionDialog("")
+                            setDisciplinedUser(null)
+                                }} variant='danger'>No</Button>
+                            </Modal.Body>
+                        </Modal>
+                    }
                     
                         
                     
@@ -104,6 +203,7 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                     <Table>
                     <thead>
                         <tr>
+                            
                             <th>Email</th>
                             <th>Username</th>
                             <th>Uploaded books count</th>
@@ -114,6 +214,7 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                             <th>Privilege</th>
                             <th>Upload ban</th>
                             <th>Review ban</th>
+                            <th>Edit permissions</th>
                         </tr>
                     </thead>
                     
@@ -123,6 +224,7 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                              allUsersQuery.length !== 0 &&
                             allUsersQuery.map((entry,index) => {
                                 return (<tr >
+                                    
                                     
                                     <td>{entry.email}</td>
                                     <td>{entry.username}</td>
@@ -134,48 +236,92 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                                         {entry.uploaded_books.map((entry) => <tr>{entry}</tr>)}
                                         </tr></td> */}
                                     <td>{entry.privilege}</td>
-                                    <td> {initalUploadBanned.filter((subEntry) => entry._id === subEntry._id).length !== 0 ?
-                                        <Button onClick={() => {
-                                            // setInitalUploadBanned(newUploadBanned.filter((subEntry) => subEntry._id !== entry._id))
-                                            // setNewUploadUnbanned([...newUploadUnbanned, entry])
-                                            // setNewUploadBanned(newUploadBanned.filter((subEntry) => subEntry._id !== entry._id))
-                                        }} variant='success' size='small'>
-                                        Allow to upload books
-                                        </Button>
-                                        :
-                                         <Button onClick={() => {
-                                        //     setInitalUploadBanned([...initalUploadBanned, entry])
-                                        //     setNewUploadBanned([...newUploadBanned, entry])
-                                        //    setNewUploadUnbanned(newUploadUnbanned.filter((subEntry) => subEntry._id !== entry._id))
-                                         }} variant='danger' size='small'>
-                                        Ban from uploading
-                                        </Button>
-                                    }
-                                       
-                                        </td>
-                                    <td>
+                                    
+                                        
+                                        
+                                        
+
+                                        <td>
+                                            {
+                                                
+
+                                                entry.upload_ban  ?
+                                                    <Button onClick={() => {
+                                                       setDisciplinedUser(entry)
+                                                       setUserDiciplineryActionDialog("UPLOAD UNBAN")
+                                                    }} variant='success' size='small'>
+                                                    Allow to upload books
+                                                    </Button>
+                                                    :
+                                                     <Button onClick={() => {
+                                                        setDisciplinedUser(entry)
+                                                        setUserDiciplineryActionDialog("UPLOAD BAN")
+
+                                                     }} variant='danger' size='small'>
+                                                    Ban from uploading
+                                                    </Button>
+                                                   
+                                                
+                                            }
+                                             
+                                           
+                                            </td>
+                                        <td>
                                         {
-                                            initalReviewBanned.filter((subEntry) => entry._id === subEntry._id).length !== 0 ?
+                                            
+
+                                            entry.review_ban ?
                                             <Button 
                                             onClick={() => {
-                                                setInitialReviewBanned(initalReviewBanned.filter((subEntry) => entry._id !== subEntry._id))
-                                                setNewReviewUnbanned([...newReviewUnbanned, entry])
-                                                setNewReviewBanned(newReviewBanned.filter((subEntry) => subEntry._id !== entry._id))
+                                                setDisciplinedUser(entry)
+                                                setUserDiciplineryActionDialog("REVIEW UNBAN")
                                             }}
                                             variant='success' size='small'>
                                                 Allow to post reviews
                                             </Button>
                                             :
                                             <Button onClick={() => {
-                                                setNewReviewBanned([...newReviewBanned, entry])
-                                                setInitialReviewBanned([...initalReviewBanned,entry])
-                                                setNewReviewUnbanned(newReviewUnbanned.filter((subEntry) => subEntry._id !== entry._id))
+                                                setDisciplinedUser(entry)
+                                                setUserDiciplineryActionDialog("REVIEW BAN")
                                             }} variant='danger' size='small'>
                                                 Ban from review posting
                                             </Button>
-                                        }
+                                            
+                                            }
                                         
                                         </td>
+                                        
+                                        
+                                    
+                                    
+                                         
+                                        <td>
+                                            {
+                                                HttpClient.isRingZero() &&
+                                                entry.privilege === 2 ?
+                                                <>
+                                                <FaLevelUpAlt onClick={() =>{
+                                                    setUserElevation(entry)
+                                                    setPermissionElevationDialog("UP")
+                                                }}  cursor={'pointer'} size={20}/>
+                                                </>
+
+
+                                                : HttpClient.isRingZero() && entry.privilege === 1 ?
+                                                <>
+                                                 <FaLevelDownAlt onClick={() => {
+                                                    setUserElevation(entry)
+                                                    setPermissionElevationDialog("DOWN")
+                                                }} cursor={'pointer'} size={20}/>
+                                                </>
+                                                
+                                                : <></>
+                                            }
+                                        </td>
+                                    
+                                    
+                                    
+                                    
                                 </tr>)
                             })
                         }

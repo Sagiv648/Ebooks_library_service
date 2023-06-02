@@ -38,12 +38,15 @@ const ReviewEntry = props => {
                             
 
                     }} disabled={!auth ? true : reportClicked ? true:  false} variant='warning' style={{marginTop: 5}}>Report for an inappropriate review</Button>
+                        Post date: {review.created_at}
                 </Col>
+                
                 <Col>
                     <Container>
                         <Card >
                             <Card.Img style={{width: 100, height: 100}} src={review && review.user.avatar ? review.user.avatar : "../user.png"}/>
                             <Card.Body>
+                                
                                 <Row >
                                     {review && review.user.username ? review.user.username : "No name"}
                                 </Row>

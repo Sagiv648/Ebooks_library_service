@@ -24,21 +24,50 @@ adminRouter.get('/users', async (req,res) => {
 adminRouter.put('/users/:userId', isRingZero ,async (req,res) => {
     const {id} = req.data;
     const {userId} = req.params;
-    if(!userId)
+    const {level} = req.query;
+    if(!userId || !level || level < 1 || level > 2)
         return res.status(400).json({error:"invalid fields"})
     try {
-        const userById = await userModel.findByIdAndUpdate(userId, {privilege: 1})
+        const userById = await userModel.findByIdAndUpdate(userId, {privilege: level})
         .select("email")
         .select("_id")
         .select("username")
         
         if(!userById)
             return res.status(400).json({error: "invalid user"})
-        return res.status(200).json({userById})
+        return res.status(200).json(userById)
     } catch (error) {
         return res.status(500).json({error: "server error"})
     }
 })
+
+adminRouter.put('/user/action/:userId', async (req,res) => {
+    const {id} = req.data;
+    const {userId} = req.params;
+    const {action} = req.query;
+    if(!userId || !action)
+        return res.status(400).json({error:"invalid fields"})
+    try {
+        let actionEdit = {}
+        if(action === "UPLOAD BAN")
+            actionEdit = {upload_ban: true}
+        else if(action === "UPLOAD UNBAN")
+            actionEdit = {upload_ban: false}
+        else if(action === "REVIEW BAN")    
+            actionEdit = {review_ban: true}
+        else if(action === "REVIEW UNBAN")
+            actionEdit = {review_ban: false}
+        else
+            return res.status(400).json({error: "invalid action"})
+
+        const userById = await userModel.findByIdAndUpdate(userId, actionEdit, {returnDocument: 'after'})
+
+        return res.status(200).json(userById)
+    } catch (error) {
+        return res.status(500).json({error: "server error"})
+    }
+})
+
 adminRouter.post('/categories', async(req,res) => {
     const {name} = req.body;
     const {id} = req.data;
@@ -75,11 +104,14 @@ adminRouter.delete('/categories', async (req,res) => {
         const deletedCategory = await categoryModel.findByIdAndDelete(removed_category,{returnDocument: 'after'})
         if(!deletedCategory)
             return res.status(400).json({error: "invalid category"})
-        const updateResult = await bookModel.updateMany({category: deletedCategory},{category: replacement_category})
+        
+        const updateResult = await bookModel.updateMany({category: deletedCategory._id},{category: replacement_category})
         if(!updateResult)
-            return res.status(500).json({error: "server error"})
+            return res.status(500).json({error: "server error"}) 
+        const updateCategory = await categoryModel.findByIdAndUpdate(replacement_category, {$inc: {books_count: deletedCategory.books_count}})
         return res.status(200).json({result: updateResult})
     } catch (error) {
+        console.log(error.message);
         return res.status(500).json({error: "server error"})
     }
 })

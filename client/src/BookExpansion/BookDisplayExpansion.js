@@ -32,6 +32,7 @@ const BookDisplayExpansion = props => {
     const [userLinkClicked, setUserLinkClicked] = useState(false)
     const [allReviews,setAllReviews] = useState([])
     const [allReviewsLoading, setAllReviewsLoading] = useState(false)
+    const [permissions,setPermissions] = useState({})
     const fetchUrlEnteredBook = async () => {
         const res = await HttpClient.GetBooks(bookId)
         if(res instanceof Error)
@@ -39,7 +40,19 @@ const BookDisplayExpansion = props => {
         else
             setExpandedBook(res)
     }
+    const fetchPermissions = async () => {
+        const res = await HttpClient.GetPermissions()
+        if(res instanceof Error)
+          toast.error(`Error with retrieving permissions ${res.message}`)
+        else
+        {
+         
+            setPermissions(res)
+        }
+          
     
+          
+      }
     const publishReview = async () => {
         
         if(reviewContent)
@@ -81,16 +94,20 @@ const BookDisplayExpansion = props => {
     }
     
     useEffect(() => {
-        console.log(bookId);
+        
         if(location.state === null)
         {
             fetchUrlEnteredBook();
         }
         if(HttpClient.isAuth())
+        {
             setAuth(true)
+            fetchPermissions()
+        }
+            
         if(!error)
             fetchReviews()
-        console.log(expandedBook);
+        
     },[])
 
 const [expandedBook, setExpandedBook] = useState(location.state)
@@ -153,9 +170,9 @@ const [expandedBook, setExpandedBook] = useState(location.state)
                     <Row>
                         <Col lg={10}>
                             <FormGroup>
-                            <FormControl onChange={(e) => {
+                            <FormControl  onChange={(e) => {
                                 setReviewContent(e.target.value)
-                            }} value={reviewContent} disabled={!auth ? true : false} type="text" as={'textarea'} placeholder="Review content..." maxLength={500} rows={4}/>
+                            }} value={reviewContent} disabled={!auth ? true : permissions.review_ban ? true : false} type="text" as={'textarea'} placeholder="Review content..." maxLength={500} rows={4}/>
                             </FormGroup>
                             
                             
@@ -167,7 +184,7 @@ const [expandedBook, setExpandedBook] = useState(location.state)
                                     setRecommended("")  
                                 else
                                     setRecommended("recommended")
-                            }} variant="success">Recommended</Button></Row>
+                            }} variant="success" disabled={permissions.review_ban}>Recommended</Button></Row>
                             <Row style={{marginTop: 10}}><Button style={recommended === 'not recommended' ? {borderWidth: 3, borderStyle: 'inset', borderColor: 'blue'} : {}} 
                             onClick={(e) => {
                                 if(recommended === 'not recommended')
@@ -175,18 +192,23 @@ const [expandedBook, setExpandedBook] = useState(location.state)
                                 else
                                     setRecommended("not recommended")
                             }}
-                            variant="danger">Not Recommended</Button></Row>
+                            variant="danger" disabled={permissions.review_ban}>Not Recommended</Button></Row>
                             <Row style={{marginTop: 10, flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                                 {
                                     reviewPublishing ? 
                                     <Spinner style={{alignSelf: 'center'}}/>
                                     : 
                                     <Button onClick={async () => {
+
                                         if(!auth)
                                             toast.info("Must be signed in to post a review")
                                         else
                                             await publishReview()
-                                } } variant="info">Publish</Button>
+                                } } variant="info" disabled={permissions.review_ban}>Publish</Button>
+                                }
+                                {
+                                    permissions.review_ban && 
+                                    "You are banned from posting reviews."
                                 }
                                </Row>
                         </Col>

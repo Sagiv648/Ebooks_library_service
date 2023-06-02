@@ -31,6 +31,7 @@ const Publish = () => {
   const [uploadFinished, setUploadFinished] = useState(false)
   const [uploadProgress, setUploadProgress] = useState({})
   const [uploadError, setUploadError] = useState("")
+  const [permissions,setPermissions] = useState({})
   const fetchCategories = async () => {
     const cats = await HttpClient.GetCategories();
     if(cats instanceof Error)
@@ -38,10 +39,27 @@ const Publish = () => {
     else
       setCategories(cats)
   }
+  const fetchPermissions = async () => {
+    const res = await HttpClient.GetPermissions()
+    if(res instanceof Error)
+      toast.error(`Error with retrieving permissions ${res.message}`)
+    else
+    {
+     
+        setPermissions(res)
+    }
+      
 
+      
+  }
   useEffect(() => {
     if(HttpClient.isAuth())
+    {
       fetchCategories();
+      fetchPermissions()
+    }
+      
+    
   },[])
 
 
@@ -103,13 +121,7 @@ const Publish = () => {
     data.append("Start", start)
     data.append("Length", offset);
     try {
-      // const res = await fetch(URL, {method: 'POST', body: file.slice(0,100), headers: {
-      
-      // }
-        
-      // })
-      // const r = await res.json();
-      // console.log(r);
+     
       var finished = true;
       
         console.log(start);
@@ -182,31 +194,36 @@ const submit = async () => {
       }
       <Form style={{backgroundColor: 'azure', borderStyle: 'inset', borderRadius: 10}}>
       <Row>
+        
         <Col style={{marginLeft: 10}}>
+          {
+          permissions.upload_ban &&
+          <Row style={{marginLeft: 20}}>You are banned from uploading books.</Row>
+          }
           <Row>
 
           <FormGroup style={{marginTop: 10}}>
             <Form.Label>Book name:</Form.Label>
-            <FormControl value={bookName} onChange={(e) => setBookName(e.target.value) } type='text' style={{width: '60%'}}></FormControl>
+            <FormControl disabled={permissions.upload_ban} value={bookName} onChange={(e) => setBookName(e.target.value) } type='text' style={{width: '60%'}}></FormControl>
           </FormGroup>
 
           </Row>
           <Row>
           <FormGroup style={{marginTop: 10}}>
             <Form.Label>Book authors:</Form.Label>
-            <FormControl value={bookAuthors} onChange={(e) => setBookAuthors(e.target.value) } type='text' style={{width: '60%'}}></FormControl>
+            <FormControl disabled={permissions.upload_ban} value={bookAuthors} onChange={(e) => setBookAuthors(e.target.value) } type='text' style={{width: '60%'}}></FormControl>
           </FormGroup>
           </Row>
           <Row>
             <FormGroup style={{marginTop: 10}}>
               <Form.Label>Publish date:</Form.Label>
-              <FormControl value={bookPublishDate} onChange={(e) => setBookPublishDate(e.target.value) } type='date' style={{width: '60%'}}></FormControl>
+              <FormControl disabled={permissions.upload_ban} value={bookPublishDate} onChange={(e) => setBookPublishDate(e.target.value) } type='date' style={{width: '60%'}}></FormControl>
             </FormGroup>
           </Row>
           <Row> 
             <Form.Label style={{marginTop: 10}}>Category:</Form.Label>
             <DropDown >
-              <DropDown.Toggle variant='info' style={{width: '60%'}}>{selectedCategory.name}</DropDown.Toggle>
+              <DropDown.Toggle disabled={permissions.upload_ban} variant='info' style={{width: '60%'}}>{selectedCategory.name}</DropDown.Toggle>
               <DropDown.Menu>
                 {categories.length > 0 && categories.map((val,ind) => 
                 (<DropDown.Item onClick={(e) => setSelectedCategory(val)} key={ind}>{val.name}</DropDown.Item>))}
@@ -218,7 +235,7 @@ const submit = async () => {
         <Col>
         <FormGroup style={{marginTop: 10, marginBottom: 10}} >
             <Form.Label >Upload:</Form.Label>
-            <FormControl onChange={(e) => {
+            <FormControl disabled={permissions.upload_ban} onChange={(e) => {
 
               pickFile(e.target.files[0])
             }} ref={filePickerRef} id='file-picker' type='file' size='small'></FormControl>
@@ -254,7 +271,7 @@ const submit = async () => {
                 <Form.Label>
                   Click to choose a cover image
                 </Form.Label>
-                <FormControl onChange={(e) => {
+                <FormControl disabled={permissions.upload_ban} onChange={(e) => {
                   if(e.target.files[0].type.split('/')[0] == 'image')
                     setCoverImage(e.target.files[0])
                   
@@ -268,7 +285,7 @@ const submit = async () => {
               
           </Row>
           <Row style={{justifyContent: 'center'}}> 
-          <Button onClick={()=> {
+          <Button disabled={permissions.upload_ban} onClick={()=> {
             setCoverImage(null)
           }} style={{ width: 70,height: 60,marginTop: 10}}>Clear image</Button>
           </Row>
@@ -278,7 +295,7 @@ const submit = async () => {
         <Row>
           <FormGroup style={{marginTop: 10, marginBottom: 10}} >
             <Form.Label >Description:</Form.Label>
-            <FormControl value={description} onChange={(e) => {
+            <FormControl disabled={permissions.upload_ban} value={description} onChange={(e) => {
               setBookDescription(e.target.value)
             }} maxLength={1000} as={'textarea'} rows={6} type='text' size='small'></FormControl>
           </FormGroup>
@@ -288,7 +305,7 @@ const submit = async () => {
           <Button onClick={clearFields} >Clear</Button>
           </Col>
           <Col>
-          <Button
+          <Button disabled={permissions.upload_ban}
           onClick={ async () => {
             
             await submit();

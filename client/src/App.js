@@ -13,6 +13,8 @@ import Uploads from './Uploads/Uploads';
 import Console from './Console/Console';
 import ErrorPage from './components/ErrorPage';
 import BookDisplayExpansion from './BookExpansion/BookDisplayExpansion';
+import { useEffect } from 'react';
+import HttpClient from './api/HttpClient';
 
 const router = createBrowserRouter([
   {
@@ -60,8 +62,12 @@ const router = createBrowserRouter([
   }
 ])
 function App() {
-
-  
+  // const challenge = async () => {
+  //   await HttpClient.ChallengeToken()
+  // }
+  // useEffect(() => {
+  //     challenge()
+  // },[])
 
 
   return (

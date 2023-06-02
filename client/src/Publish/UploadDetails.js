@@ -15,9 +15,8 @@ const UploadDetails = props => {
         <Modal.Header>{uploadFinished ? "Upload finished" : "Uploading... please don't exit the browser until the upload is finished."}</Modal.Header>
         <Modal.Title>{bookName}</Modal.Title>
         
-            <ProgressBar now={(progressData.progress/100*progressData.size).toFixed(0)}/>
-        
-        {/* <Modal.Title>{uploadFinished ? "Uploading finished." : progressData.progress + " bytes uploaded." } </Modal.Title> */}
+            
+        <Modal.Title>{uploadFinished ? "Uploading finished." : progressData.progress + "/" + progressData.size + " bytes uploaded." } </Modal.Title>
         {
             uploadError &&
             <Modal.Body>An error occured with the upload: {uploadError}</Modal.Body>

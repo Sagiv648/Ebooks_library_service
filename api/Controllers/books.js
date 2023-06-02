@@ -142,6 +142,11 @@ router.post('/',auth ,async (req,res) => {
             return res.status(400).json({error: "invalid fields"})
 
         try {
+
+            const userRecord = await userModel.findById(id)
+            if(userRecord.upload_ban)
+                return res.status(403).json({error: "banned"})
+
             const book = new bookModel
             (
                 {
