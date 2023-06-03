@@ -18,7 +18,7 @@ import crypto from 'crypto-js'
 //TODO: Fix or remove features from the avatar upload
 const Profile = () => {
   
-  const [profile,setProfile] = useState(null)
+  const [profile,setProfile] = useState({})
   
   const [avatar,setAvatar] = useState(null)
   const inputCoverRef = useRef();
@@ -30,16 +30,16 @@ const Profile = () => {
   const [description,setDescription] = useState("")
   const [newAvatar,setNewAvatar] = useState("")
   const fetchProfile = () => {
-    const profile = HttpClient.GetProfile();
-    if(profile)
+    const profile1 = HttpClient.GetProfile();
+    if(profile1)
     {
-      setProfile(profile)
-      if(profile.avatar)
-        setAvatar(profile.avatar)
+      setProfile(profile1)
+      if(profile1.avatar)
+        setAvatar(profile1.avatar)
       else
         setAvatar("../user.png")
-      setUsername(profile.username)
-      setDescription(profile.description)
+      setUsername(profile1.username)
+      setDescription(profile1.description)
     }
     
 
@@ -69,16 +69,13 @@ const Profile = () => {
     
     
     console.log("xxx");
-    
+    const data = {...profile,username: username, description: description, avatar : profile.avatar}
     if(avatar instanceof Blob )
     {
       const file_name = crypto.SHA256(`${profile.id}`)
       //console.log("it's a blob");
       const mime = avatar.name.split('.').slice(-1)
-      const image = await StorageClient.Upload(avatar, "avatars", `${file_name}.${mime}`,null,null,() => {
-        setProfile({...profile, avatar: image.download_url})
-        setAvatar(image.download_url)
-      })
+      const image = await StorageClient.Upload(avatar, "avatars", `${file_name}.${mime}`)
       //profile.avatar = await StorageClient.UploadAvatar({avatar: avatar, id: profile.id})
       if(!image)
       {
@@ -87,29 +84,40 @@ const Profile = () => {
       }
       //console.log(image);
       
-      
-      
+      data.avatar = image.download_url
+      setAvatar(image.download_url)
       //console.log(profile.avatar);
     }
     else if(avatar === '../user.png')
-      setProfile({...profile, avatar : ""})
-    setProfile({...profile, username: username, description: description})
+      data.avatar = ""
     
-    console.log(profile.email);
+    
+    
     //setAvatar(profile.avatar ? profile.avatar : "../user.png")
-    const newProfile = await HttpClient.EditProfile(profile)
     
-    if(newProfile instanceof Error)
-    {
-      toast.error(`Error occured`)
-    }
-    else
-    {
+    HttpClient.EditProfile(data)
+    .then((newProfile) => {
+      console.log("xyz");
       toast.success("Profile successfully updated.")
+      //fetchProfile()
       setProfile(newProfile)
-      //setAvatar(picture)
-      setNewAvatar("")
-    }
+    })
+    .catch((err) => {
+      toast.error(`Error occured`)
+    })
+    
+    //const newProfile = await HttpClient.EditProfile(data)
+    // if(newProfile instanceof Error)
+    // {
+    //   toast.error(`Error occured`)
+    // }
+    // else
+    // {
+    //   toast.success("Profile successfully updated.")
+    //   setProfile(newProfile)
+  
+    //   setNewAvatar("")
+    // }
     //const picture = await StorageClient.UploadAvatar()
   }
 
@@ -122,6 +130,9 @@ const Profile = () => {
     
   },[])
 
+  useEffect(() => {
+    setAvatar( profile && profile.avatar ? profile.avatar : "../user.png")
+  },[profile])
 
 
   return (
@@ -176,7 +187,7 @@ const Profile = () => {
             textAlign: 'center',
               height: 300,marginTop: 10 ,width: 200,
               
-            backgroundImage: `url(${avatar instanceof Blob ? URL.createObjectURL(avatar) : avatar ? avatar : "../user.png" })`}}>
+            backgroundImage: `url(${avatar instanceof Blob ? URL.createObjectURL(avatar) : avatar })`}}>
 
               
               <FormGroup>
@@ -186,7 +197,7 @@ const Profile = () => {
                 <FormControl onChange={(e) => {
                   if(e.target.files[0].type.split('/')[0] == 'image')
                     setAvatar(e.target.files[0])
-                    console.log(e.target.files[0] instanceof Blob);
+                    
                 }}  id='cover-file' ref={inputCoverRef} style={{visibility: 'hidden'}} type='file'/>
 
               </FormGroup>
@@ -230,7 +241,7 @@ const Profile = () => {
           (profile && (username !== profile.username || description !== profile.description || avatar instanceof Blob || (profile.avatar && avatar === '../user.png'))) &&
            <Row style={{justifyContent: 'center', marginTop: 20, marginBottom: 10}}>
             <Button onClick={async () => {
-              console.log("i see it i click it");
+              
               await saveChanges()
             }} variant='success' style={{width: '50%'}}>Save changes</Button>
           </Row>

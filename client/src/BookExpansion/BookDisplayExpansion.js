@@ -141,7 +141,7 @@ const BookDisplayExpansion = props => {
                     <Row>
                         <Col lg={2}>
                         <Row>
-                            <img style={{width: 200, height: 200}} src={expandedBook.cover ? expandedBook.cover : "../default-cover.png"}/>
+                            <img style={{width: 200, height: 200}} src={expandedBook.book.cover_image ? expandedBook.book.cover_image : "../default-cover.png"}/>
                             
                         </Row>
                            <Button style={{ width: 100,marginTop: 5, marginBottom: 10,alignSelf: 'center'}} variant="success" onClick={(e) => {

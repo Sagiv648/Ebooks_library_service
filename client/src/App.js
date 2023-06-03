@@ -13,7 +13,7 @@ import Uploads from './Uploads/Uploads';
 import Console from './Console/Console';
 import ErrorPage from './components/ErrorPage';
 import BookDisplayExpansion from './BookExpansion/BookDisplayExpansion';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import HttpClient from './api/HttpClient';
 
 const router = createBrowserRouter([
@@ -62,6 +62,21 @@ const router = createBrowserRouter([
   }
 ])
 function App() {
+  const [profile,setProfile] = useState(null)
+  useEffect(() => {
+    HttpClient.SubscribeProfileChange({id: "root", cb: (data) => {
+        console.log("xxxxxxxxxx");
+      setProfile(data)
+    }})
+    console.log("xxxxxxxxxx211");
+    
+   
+  return () => {
+    HttpClient.UnsubscribeProfileChange("root")
+    
+    
+  }
+  },[])
   // const challenge = async () => {
   //   await HttpClient.ChallengeToken()
   // }

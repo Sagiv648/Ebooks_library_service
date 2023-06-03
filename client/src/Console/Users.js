@@ -198,7 +198,7 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                     allUsersLoading ?  
                     <Row>Gathering items...</Row>
                     :
-                    <Table>
+                    <Table >
                     <thead>
                         <tr>
                             
@@ -211,12 +211,12 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                             <th>Upload banned</th>
                             <th>Privilege</th>
                             <th>Upload ban</th>
-                            <th>Review ban</th>
+                            
                             <th>Edit permissions</th>
                         </tr>
                     </thead>
                     
-                    <tbody>
+                    <tbody style={{overflow: 'scroll'}}>
                     
                         {
                              allUsersQuery.length !== 0 &&
@@ -264,7 +264,7 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                                              
                                            
                                             </td>
-                                        <td>
+                                        {/* <td>
                                         {
                                             
 
@@ -287,7 +287,7 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                                             
                                             }
                                         
-                                        </td>
+                                        </td> */}
                                         
                                         
                                     

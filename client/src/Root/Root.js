@@ -24,10 +24,11 @@ import 'react-toastify/dist/ReactToastify.css';
 //TODO: 7) Implement a button to add a review for the book
 const Root = () => {
 
+  const [isSmallerView, setSmallerView] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   
   const [profile,setProfile] = useState(null)
- 
+  const [avatar,setAvatar] = useState("")
   const [uploads, setUploads] = useState([])
   const [privileged, setPrivileged] = useState(false)
   const [downloadedBooks,setDownloadedBooks] = useState({})
@@ -65,6 +66,21 @@ const Root = () => {
   }
   useEffect(() => {
 
+    const focus = window.addEventListener('focus', (e) => {
+      const x = HttpClient.GetProfile()
+      console.log("tom mozz");
+       
+        setProfile(x)
+      console.log("this is focused now");
+    })
+    const resizeSubscriber = window.addEventListener('resize', (e) => {
+      if(window.innerWidth <= 760)
+        setSmallerView(true)
+      else
+        setSmallerView(false)
+        console.log(window.innerWidth);
+    })
+
     if(HttpClient.isAuth())
     {
       initStorage()
@@ -79,6 +95,7 @@ const Root = () => {
     const item = localStorage.getItem("profile")
     
     HttpClient.FetchStorage((profile) => {
+      
       setProfile(profile);
     })
     HttpClient.SubscribeAuthState(async (profile) => {
@@ -94,21 +111,22 @@ const Root = () => {
       }
       })
       HttpClient.SubscribeProfileChange({id: "root", cb: (data) => {
-        console.log("this is the callback");
-        setProfile(data)
+        console.log("tom mozz");
+        console.log(data);
+        const x = HttpClient.GetProfile()
+        setProfile(x)
       }})
     
       
      
     return () => {
       HttpClient.UnsubscribeProfileChange("root")
-      
-      
+      window.removeEventListener('focus', focus)
+      window.removeEventListener("resize",resizeSubscriber)
     }
   },[])
 
-  
-  
+
   useLayoutEffect(() => {
     if(HttpClient.isPrivileged())
         setPrivileged(true)
@@ -176,7 +194,7 @@ const Root = () => {
         }})
       }
       else if(location.pathname !== '/' && HttpClient.isAuth())
-      { console.log("gets here?");
+      { 
         updateDownloadsCounts()
         HttpClient.UnsubscribeDownloadCountUpdate("root")
       }
@@ -189,7 +207,7 @@ const Root = () => {
 
   return (
     <>
-    <Navbar className='navbar-header' bg='light' expand="lg" onToggle={() => {
+    <Navbar style={isSmallerView ? {width: 1000} : {}} className='navbar-header' bg='light' expand="lg" onToggle={() => {
       setCollapsed(!collapsed)
       
     }}>
@@ -247,7 +265,7 @@ const Root = () => {
           {profile && <Navbar.Brand onClick={() => {
               //setAvatarClicked(!avatarClicked)
 
-          }}><img className='avatar-img' src={profile.avatar ? profile.avatar : "../user.png"}/></Navbar.Brand>}
+          }}><img className='avatar-img' src={ profile.avatar ? profile.avatar : "../user.png"}/></Navbar.Brand>}
           
           </Navbar.Collapse>
           

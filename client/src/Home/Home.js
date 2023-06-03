@@ -33,6 +33,8 @@ const Home = () => {
   const fetchAllBooks = async () => {
     setIsLoading(true)
      HttpClient.GetBooks().then((res) => {
+      console.log(res);
+      
       setAllBooks(res)
         const sorted = res.sort((entry1,entry2) => entry2.downloads_count - entry1.downloads_count)
         const topfive =[]
@@ -41,7 +43,7 @@ const Home = () => {
           topfive.push(sorted[i])
         }
         setTopFiveDownloads(topfive)
-        
+        console.log(books);
         
      })
      .catch((err) => {
@@ -104,7 +106,7 @@ const fetchCategories = async () => {
       setQueriedBooks(books.filter((book,index) => book.name.includes(name)))
     
   }
-  
+  console.log(books);
   return (
     
     !exapnded ?
@@ -203,13 +205,14 @@ const fetchCategories = async () => {
         <p style={{alignSelf: 'center'}}>Gathering items...</p>
         :
         (
+
         <Container>
         {
         books.length !== 0 &&
         <ListGroup style={{ marginTop: 30}}>
                 <Row>
                 {
-                  books.map((book, index) => {
+                    books.map((book, index) => {
                     return (
                       <Col style={{marginBottom: 30}} key={book._id}>
                       

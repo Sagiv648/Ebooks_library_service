@@ -303,25 +303,26 @@ class HttpClient{
     {
         try {
             const token = this.#GetToken()
-            console.log(token);
+           
             if(!token)
                 throw new Error("invalid session")
-                console.log("hello?");
-            
+                
+            console.log("data sent to editprofile is....");
+            console.log(data);
+            console.log("---------------------------");
             const res = await this.#api.put('/user/profile', data, {
                 headers: {
                     authorization: `Bearer ${token}`
                 }
             })
-            console.log("yes?");
+            
             if(res.status !== 200)
                 throw new Error(res.data.error)
             const strItem = localStorage.getItem("profile")
             const item = JSON.parse(strItem)
             const newItem = data
             localStorage.setItem('profile', JSON.stringify(newItem))
-            console.log("hello");
-            console.log(this.#profileChangeSubscribers);
+            
             this.#profileChangeSubscribers.forEach((entry) => entry.cb(res.data))
             return res.data;
         } catch (error) {
