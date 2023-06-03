@@ -202,9 +202,9 @@ const Root = () => {
     
   },[location])
 
-  
-  
-
+  console.log("on root");
+  console.log(profile ? profile.avatar : "");
+  console.log("end root");
   return (
     <>
     <Navbar style={isSmallerView ? {width: 1000} : {}} className='navbar-header' bg='light' expand="lg" onToggle={() => {
@@ -259,13 +259,13 @@ const Root = () => {
             )
           }
           {
-            profile ? <Navbar.Brand>{profile.username ? profile.username : profile.email}</Navbar.Brand> : <Navbar.Brand>Guest</Navbar.Brand>
+            profile ? <Navbar.Brand>Hello {profile.username ? profile.username : profile.email}</Navbar.Brand> : <Navbar.Brand>Guest</Navbar.Brand>
           }
           
-          {profile && <Navbar.Brand onClick={() => {
+          {/* {profile && <Navbar.Brand onClick={() => {
               //setAvatarClicked(!avatarClicked)
 
-          }}><img className='avatar-img' src={ profile.avatar ? profile.avatar : "../user.png"}/></Navbar.Brand>}
+          }}><img className='avatar-img' src={ profile.avatar ? profile.avatar : "../user.png"}/></Navbar.Brand>} */}
           
           </Navbar.Collapse>
           

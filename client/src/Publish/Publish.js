@@ -42,6 +42,7 @@ const Publish = () => {
   }
   const fetchPermissions = async () => {
     const res = await HttpClient.GetPermissions()
+    console.log(res);
     if(res instanceof Error)
       toast.error(`Error with retrieving permissions ${res.message}`)
     else

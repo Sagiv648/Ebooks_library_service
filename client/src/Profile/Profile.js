@@ -20,7 +20,7 @@ const Profile = () => {
   
   const [profile,setProfile] = useState({})
   
-  const [avatar,setAvatar] = useState(null)
+  const [avatar,setAvatar] = useState("")
   const inputCoverRef = useRef();
   const [uploadedBooksCount, setUploadedBooksCount] = useState(0)
   const [uploadedBooks, setUploadedBooks] = useState([])
@@ -28,7 +28,9 @@ const Profile = () => {
   const [itemToDelete,setItemToDelete] = useState({})
   const [username,setUsername] = useState("")
   const [description,setDescription] = useState("")
-  const [newAvatar,setNewAvatar] = useState("")
+  const [newAvatar,setNewAvatar] = useState(null)
+  const [action,setAction] = useState("")
+  const [fileUrl, setFileUrl] = useState("")
   const fetchProfile = () => {
     const profile1 = HttpClient.GetProfile();
     if(profile1)
@@ -68,7 +70,7 @@ const Profile = () => {
   const saveChanges = async ()=> {
     
     
-    console.log("xxx");
+    
     const data = {...profile,username: username, description: description, avatar : profile.avatar}
     if(avatar instanceof Blob )
     {
@@ -85,11 +87,13 @@ const Profile = () => {
       //console.log(image);
       
       data.avatar = image.download_url
-      setAvatar(image.download_url)
+      //setAvatar(image.download_url)
+      //setNewAvatar(null)
       //console.log(profile.avatar);
     }
-    else if(avatar === '../user.png')
+    else
       data.avatar = ""
+    
     
     
     
@@ -101,6 +105,9 @@ const Profile = () => {
       toast.success("Profile successfully updated.")
       //fetchProfile()
       setProfile(newProfile)
+      setAvatar(newProfile.avatar)
+      //setFileUrl(URL.revokeObjectURL(fileUrl))
+      //setAction("CLEAR")
     })
     .catch((err) => {
       toast.error(`Error occured`)
@@ -129,11 +136,22 @@ const Profile = () => {
     
     
   },[])
-
   useEffect(() => {
-    setAvatar( profile && profile.avatar ? profile.avatar : "../user.png")
-  },[profile])
-
+    switch (action) {
+      case "CLEAR":
+        //URL.revokeObjectURL(fileUrl)
+        setFileUrl(URL.revokeObjectURL(fileUrl))
+        if(profile.avatar)
+          setAvatar(profile.avatar)
+        else
+          setAvatar("../user.png")
+        break;
+    
+      case "DEFAULT":
+        setAvatar("../user.png")
+        break;
+    }
+  },[action])
 
   return (
     
@@ -187,7 +205,7 @@ const Profile = () => {
             textAlign: 'center',
               height: 300,marginTop: 10 ,width: 200,
               
-            backgroundImage: `url(${avatar instanceof Blob ? URL.createObjectURL(avatar) : avatar })`}}>
+            backgroundImage: `url(${fileUrl ? fileUrl : avatar })`}}>
 
               
               <FormGroup>
@@ -196,7 +214,14 @@ const Profile = () => {
                 </Form.Label>
                 <FormControl onChange={(e) => {
                   if(e.target.files[0].type.split('/')[0] == 'image')
+                  {
+                    // if(fileUrl)
+                    //   setFileUrl(URL.revokeObjectURL(fileUrl))
                     setAvatar(e.target.files[0])
+                    setFileUrl(URL.createObjectURL(e.target.files[0]))
+                    setAction("")
+                  }
+                    
                     
                 }}  id='cover-file' ref={inputCoverRef} style={{visibility: 'hidden'}} type='file'/>
 
@@ -206,15 +231,15 @@ const Profile = () => {
           </Row>
           <Row style={{justifyContent: 'center'}}> 
           <Button onClick={()=> {
+            setAction("CLEAR")
+            
             //setAvatar(profile.avatar)
-            if(profile.avatar)
-              setAvatar(profile.avatar)
-            else
-              setAvatar("../user.png")
+            
           }} style={{ width: '20%',height: 60,marginTop: 10, marginRight: 10}}>Clear picked avatar</Button>
           <Button variant='secondary' onClick={()=> {
-           
-            setAvatar("../user.png")
+            setAction("DEFAULT")
+            
+            
             
           }} style={{ width: '20%',height: 60,marginTop: 10}}>Set default avatar</Button>
           </Row>

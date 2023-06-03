@@ -159,7 +159,14 @@ router.put('/profile', auth, async (req,res) => {
         const updatedUser = await userModel.findByIdAndUpdate(id,data, {returnDocument: 'after'}).select('-password')
         if(!updatedUser)
             return res.status(500).json({error: "server error"})
-        return res.status(200).json(updatedUser)
+        return res.status(200).json({profile:  {
+            email: updatedUser.email,
+            avatar: updatedUser.avatar,
+            _id: updatedUser._id,
+            username: updatedUser.username,
+            downloaded_books: updatedUser.downloaded_books,
+            description: updatedUser.description
+        }})
     } catch (error) {
         return res.status(500).json({error: "server error"})
     }

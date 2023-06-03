@@ -324,7 +324,7 @@ class HttpClient{
             localStorage.setItem('profile', JSON.stringify(newItem))
             
             this.#profileChangeSubscribers.forEach((entry) => entry.cb(res.data))
-            return res.data;
+            return res.data.profile;
         } catch (error) {
             return error;
         }
