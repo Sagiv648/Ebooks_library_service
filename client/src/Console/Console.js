@@ -1,17 +1,11 @@
 import React, { useState } from 'react'
 import Container from 'react-bootstrap/esm/Container'
-import Row from 'react-bootstrap/esm/Row'
 import Col from 'react-bootstrap/esm/Col'
 import Users from './Users'
 import Categories from './Categories'
 import Books from './Books'
-import Reviews from './Reviews'
-import Button from 'react-bootstrap/Button'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
-import { Link } from 'react-router-dom'
-import Tab from 'react-bootstrap/Tab'
-import Tabs from 'react-bootstrap/Tabs'
 //Ring one admins can see all users
 //Ring one admins can post new categories
 //Ring one admins can delete categories
@@ -57,15 +51,7 @@ const Console = () => {
               </Nav.Item>
             </Nav.Link>
           </Col>
-          {/* <Col>
-            <Nav.Link onClick={() => {
-              setPage("reviews")
-            }}>
-              <Nav.Item style={page === "reviews" ? {color: 'blue'} : {}}>
-                Reviews
-              </Nav.Item>
-            </Nav.Link>
-          </Col> */}
+          
 
         
          
@@ -82,9 +68,7 @@ const Console = () => {
         <Categories/> 
         : page === "books" ?
          <Books/> 
-         : page === "reviews" ?
-         <Reviews/>
-         :
+         : 
          <></>
 
       }

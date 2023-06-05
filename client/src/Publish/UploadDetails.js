@@ -19,7 +19,15 @@ const UploadDetails = props => {
         <Modal.Title>{uploadFinished ? "Uploading finished." : progressData.progress + "/" + progressData.size + " bytes uploaded." } </Modal.Title>
         {
             uploadError &&
-            <Modal.Body>An error occured with the upload: {uploadError}</Modal.Body>
+            <Modal.Body>An error occured with the upload: {uploadError}
+            <Button variant='danger' style={{width: 100, alignSelf: 'center'}} onClick={(e) => {
+                setUploadStart(false)
+                setExit(!exit)
+                
+            }}>
+            Exit
+        </Button>
+            </Modal.Body>
         }
         {
             uploadFinished && 

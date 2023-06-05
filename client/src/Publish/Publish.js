@@ -33,6 +33,7 @@ const Publish = () => {
   const [uploadProgress, setUploadProgress] = useState({})
   const [uploadError, setUploadError] = useState("")
   const [permissions,setPermissions] = useState({})
+  const [isSmallerView,setSmallerView] = useState(false)
   const fetchCategories = async () => {
     const cats = await HttpClient.GetCategories();
     if(cats instanceof Error)
@@ -60,8 +61,19 @@ const Publish = () => {
       fetchCategories();
       fetchPermissions()
     }
-      
-    
+    if(window.innerWidth <= 760)
+    setSmallerView(true)
+
+    const resizeSubscriber = window.addEventListener('resize', (e) => {
+      if(window.innerWidth <= 760)
+        setSmallerView(true)
+      else
+        setSmallerView(false)
+        console.log(window.innerWidth);
+    })
+    return () => {
+      window.removeEventListener("resize",resizeSubscriber)
+    }
   },[])
 
 
@@ -96,7 +108,7 @@ const Publish = () => {
 
         const mime = file.name.split('.').slice(-1)[0]
       
-      //StorageClient.UploadEbook2(data)
+      
       const book_file_name = crypto.SHA256(`${userId}_${upload_date}`).toString()
 
       const book = await StorageClient.Upload(file, "ebooks",book_file_name + `.${mime}`, () => {
@@ -121,29 +133,9 @@ const Publish = () => {
       return;
     }
       data.download_url = book.download_url
-      //Ofcourse save data
+      
 
-      // StorageClient.UploadEbook(data,
-      //   () => {
-      //     setUploadFinished(false)
-      //     setUploadStart(true)
-      //     setUploadProgress("0/100")
-      // },
-      // (progressData) => {
-      //   setUploadProgress(progressData)
-      // },
-      // () => {
-      //   console.log("finished here?");
-      //   setUploadFinished(true)
-      //   //setUploadStart(false)
-      //   setUploadProgress("")
-      //   clearFields()
-      // }, 
-      // (error) => {
-      //   setUploadError(error.message)
-      // })
-      // console.log("yeaaa?");
-
+  
 
       const res = await HttpClient.UploadBook(data)
       if(res instanceof Error)
@@ -154,53 +146,9 @@ const Publish = () => {
         toast.success(`Book named ${data.name} successfully added.`)
 
     }
-    //const beganUpload = StorageClient.UploadEbook()
+    
   }
-  const uploadFileTesting = async () => {
-    const URL = "http://localhost:5089/weatherforecast/thisisabucket"
-    const data = new FormData();
-
-    var start = 0;
-    var offset = 8192;
-    var len = file.size;
-    data.append("File",file.slice(start,offset))
-    data.append("Name", file.name)
-    data.append("FileSize", file.size)
-    data.append("Start", start)
-    data.append("Length", offset);
-    try {
-     
-      var finished = true;
-      
-        console.log(start);
-         for(;start < len;)
-         {
-            const res = await axios.post(URL, data, {headers: {
-              "Content-Type": "multipart/form-data",
-              
-            }})
-
-            if(res.status == 200)
-            {
-              start += offset;
-              console.log(start);
-              data.set("File",file.slice(start,start+offset))
-              data.set("Start", start);
-              
-            }
-          
-            
-          
-         
-         
-        
-        }
-      
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-
+ 
   const pickFile = (file) => {
     
     const extension = file.name.split('.').slice(-1);
@@ -230,7 +178,7 @@ const submit = async () => {
   //await uploadFileTesting();
 }
   return (
-    <Container style={{margin: 10}}>
+    <Container style={isSmallerView ? {marginTop: 10} : {margin: 10}}>
       {
         uploadStart &&
         <UploadDetails 
@@ -252,26 +200,26 @@ const submit = async () => {
 
           <FormGroup style={{marginTop: 10}}>
             <Form.Label>Book name:</Form.Label>
-            <FormControl disabled={permissions.upload_ban} value={bookName} onChange={(e) => setBookName(e.target.value) } type='text' style={{width: '60%'}}></FormControl>
+            <FormControl disabled={permissions.upload_ban} value={bookName} onChange={(e) => setBookName(e.target.value) } type='text' style={ isSmallerView ? {width: '100%'}: {width: '60%'}}></FormControl>
           </FormGroup>
 
           </Row>
           <Row>
           <FormGroup style={{marginTop: 10}}>
             <Form.Label>Book authors:</Form.Label>
-            <FormControl disabled={permissions.upload_ban} value={bookAuthors} onChange={(e) => setBookAuthors(e.target.value) } type='text' style={{width: '60%'}}></FormControl>
+            <FormControl disabled={permissions.upload_ban} value={bookAuthors} onChange={(e) => setBookAuthors(e.target.value) } type='text' style={ isSmallerView ? {width: '100%'}:{width: '60%'}}></FormControl>
           </FormGroup>
           </Row>
           <Row>
             <FormGroup style={{marginTop: 10}}>
               <Form.Label>Publish date:</Form.Label>
-              <FormControl disabled={permissions.upload_ban} value={bookPublishDate} onChange={(e) => setBookPublishDate(e.target.value) } type='date' style={{width: '60%'}}></FormControl>
+              <FormControl disabled={permissions.upload_ban} value={bookPublishDate} onChange={(e) => setBookPublishDate(e.target.value) } type='date' style={isSmallerView ? {width: '100%'}:{width: '60%'}}></FormControl>
             </FormGroup>
           </Row>
           <Row> 
             <Form.Label style={{marginTop: 10}}>Category:</Form.Label>
             <DropDown >
-              <DropDown.Toggle disabled={permissions.upload_ban} variant='info' style={{width: '60%'}}>{selectedCategory.name}</DropDown.Toggle>
+              <DropDown.Toggle disabled={permissions.upload_ban} variant='info' style={{width: 'auto'}}>{selectedCategory.name}</DropDown.Toggle>
               <DropDown.Menu>
                 {categories.length > 0 && categories.map((val,ind) => 
                 (<DropDown.Item onClick={(e) => setSelectedCategory(val)} key={ind}>{val.name}</DropDown.Item>))}
@@ -289,7 +237,7 @@ const submit = async () => {
             }} ref={filePickerRef} id='file-picker' type='file' size='small'></FormControl>
           </FormGroup>
           {
-            file &&
+            file && !isSmallerView &&
             <Container>
               <Row>File name: {file.name}</Row>
             <Row>File size: {file.size}</Row>

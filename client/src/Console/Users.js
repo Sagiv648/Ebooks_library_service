@@ -9,7 +9,7 @@ import Col from 'react-bootstrap/esm/Col'
 import FormControl from 'react-bootstrap/FormControl'
 import Button from 'react-bootstrap/esm/Button'
 import {FaLevelUpAlt, FaLevelDownAlt} from 'react-icons/fa'
-import ModalDialog from 'react-bootstrap/esm/ModalDialog'
+
 import Modal from 'react-bootstrap/Modal'
 import Spinner from 'react-bootstrap/esm/Spinner'
 const Users = props => {
@@ -25,6 +25,7 @@ const Users = props => {
     const [elevationPermissionLoader,setElevationPermissionLoader] = useState(false)
     const [disciplinedUser,setDisciplinedUser] = useState(null)
     const [disciplineUserLoader,setDisciplineUserLoader] = useState(false)
+    const [isSmallerView, setSmallerView] = useState(false)
     const fetchAllUsers = async () => {
         setAllUsersLoading(true)
         const res = await HttpClient.GetAllUsers()
@@ -88,8 +89,20 @@ const Users = props => {
     }
     
 useEffect(() => {
-    
+    if(window.innerWidth <= 760)
+        setSmallerView(true)
+    const resizeSubscriber = window.addEventListener('resize', (e) => {
+        if(window.innerWidth <= 760)
+          setSmallerView(true)
+        else
+          setSmallerView(false)
+          console.log(window.innerWidth);
+      })
     fetchAllUsers()
+
+    return () => {
+        window.removeEventListener("resize",resizeSubscriber)
+    }
 },[])
 const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userName) && entry.email.includes(userEmail))
   return (
@@ -197,6 +210,65 @@ const allUsersQuery = allUsers.filter((entry) => entry.username.includes(userNam
                 {
                     allUsersLoading ?  
                     <Row>Gathering items...</Row>
+                    :
+                    isSmallerView ? 
+                    <Row>
+                        <Col>
+                            {allUsersQuery.map((entry) => {
+                                return (<Row key={entry._id} style={{marginTop: 10, borderStyle: 'inset', borderWidth: 1,}}>
+                                        <Row>Email:{entry.email}</Row>
+                                        <Row>Username: {entry.username}</Row>
+                                        <Row>Uploaded books count: {entry.uploaded_books_count}</Row>
+                                        <Row>Joining date: {entry.created_at}</Row>
+                                        <Row>Upload banned: {entry.upload_ban}</Row>
+                                        <Row>Privilege level: {entry.privilege}</Row>
+                                        <Row >{
+                                                
+
+                                                entry.upload_ban  ?
+                                                    <Button onClick={() => {
+                                                       setDisciplinedUser(entry)
+                                                       setUserDiciplineryActionDialog("UPLOAD UNBAN")
+                                                    }} variant='success' size='small'>
+                                                    Allow to upload books
+                                                    </Button>
+                                                    :
+                                                     <Button onClick={() => {
+                                                        setDisciplinedUser(entry)
+                                                        setUserDiciplineryActionDialog("UPLOAD BAN")
+
+                                                     }} variant='danger' size='small'>
+                                                    Ban from uploading
+                                                    </Button>
+                                                   
+                                                
+                                            }</Row>
+                                            <Row>Edit permissions : {
+                                                HttpClient.isRingZero() &&
+                                                entry.privilege === 2 ?
+                                                <>
+                                                <FaLevelUpAlt onClick={() =>{
+                                                    setUserElevation(entry)
+                                                    setPermissionElevationDialog("UP")
+                                                }}  cursor={'pointer'} size={20}/>
+                                                </>
+
+
+                                                : HttpClient.isRingZero() && entry.privilege === 1 ?
+                                                <>
+                                                 <FaLevelDownAlt onClick={() => {
+                                                    setUserElevation(entry)
+                                                    setPermissionElevationDialog("DOWN")
+                                                }} cursor={'pointer'} size={20}/>
+                                                </>
+                                                
+                                                : <></>
+                                            }</Row>
+                                    </Row>)
+                            })}
+                            
+                        </Col>
+                    </Row>
                     :
                     <Table >
                     <thead>

@@ -28,6 +28,7 @@ const Books = () => {
   const [queryBookName, setQueryBookName] = useState("")
   const [queryCategoryName, setQueryCategoryName] = useState("")
   const [sortClicked,setSortClicked] = useState(false)
+  const [isSmallerView,setSmallerView] = useState(false)
   const fetchBooks = async () => {
     setBooksLoading(true)
     const res = await HttpClient.GetBooksUnfiltered()
@@ -59,7 +60,21 @@ const Books = () => {
   }
 
   useEffect(() => {
+    if(window.innerWidth <= 760)
+        setSmallerView(true)
+
+        const resizeSubscriber = window.addEventListener('resize', (e) => {
+          if(window.innerWidth <= 760)
+            setSmallerView(true)
+          else
+            setSmallerView(false)
+            console.log(window.innerWidth);
+        })
     fetchBooks()
+
+    return () => {
+      window.removeEventListener("resize",resizeSubscriber)
+  }
   },[])
 
   const booksByQuery = allBooks.filter((entry) => {
@@ -148,6 +163,37 @@ const Books = () => {
       {
         booksLoading ?
         <Row>Gathering items...</Row>
+        : 
+        isSmallerView ?
+        <Row>
+          <Col>
+          <Row>{!sortClicked ? < FaSortUp style={{marginTop: 20, alignSelf: 'center'}} onClick={() => {setSortClicked(!sortClicked); }} cursor={'pointer'} size={30} /> : <FaSortDown onClick={() => {setSortClicked(!sortClicked); }} cursor={'pointer'} size={30}/>}</Row>
+          
+          {booksByQuery.length !== 0 && booksByQuery.map((entry) => {
+            return (<Row  key={entry._id}  style={{marginTop: 10, borderStyle: 'inset', borderWidth: 1,}}>
+              <Row>Id: {entry._id}</Row>
+              <Row>Name: {entry.name}</Row>
+              <Row>Category: {entry.category.name}</Row>
+              <Row>Authors: {entry.authors}</Row>
+              <Row>Publish date: {entry.published_at}</Row>
+              <Row>Upload date: {entry.uploaded_at}</Row>
+              <Row>Uploader: {entry.user.email}</Row>
+              <Row>Downloads count: {entry.downloads_count}</Row>
+              <Row>Report count: {entry.report_count}</Row>
+              <Row>
+                <Col><MdMore onClick={() => {
+              setExpandedBook(entry)
+              setExpanded(true)
+            }} cursor={'pointer'} size={30} color='blue'/></Col>
+                <Col><FiDelete onClick={async () => {
+                setBookToDelete(entry)
+                setDeletionDialog(true)
+            }} cursor={'pointer'} size={30} color='red'/></Col>
+              </Row>
+            </Row>)
+          })}
+          </Col>
+        </Row>
         :
         <Table>
       <thead>

@@ -31,6 +31,7 @@ const Profile = () => {
   const [newAvatar,setNewAvatar] = useState(null)
   const [action,setAction] = useState("")
   const [fileUrl, setFileUrl] = useState("")
+  const [isSmallerView,setSmallerView] = useState(false)
   const fetchProfile = () => {
     const profile1 = HttpClient.GetProfile();
     if(profile1)
@@ -131,10 +132,24 @@ const Profile = () => {
 
   useEffect(() => {
     
+    if(window.innerWidth <= 760)
+        setSmallerView(true)
+
+        const resizeSubscriber = window.addEventListener('resize', (e) => {
+          if(window.innerWidth <= 760)
+            setSmallerView(true)
+          else
+            setSmallerView(false)
+            console.log(window.innerWidth);
+        })
+
+
     fetchBooks();
     fetchProfile();
     
-    
+    return () => {
+      window.removeEventListener("resize",resizeSubscriber)
+    }
   },[])
   useEffect(() => {
     switch (action) {
@@ -155,7 +170,7 @@ const Profile = () => {
 
   return (
     
-      <Container style={{backgroundColor: 'AppWorkspace',marginTop: 20,width: '80%',borderRadius: 25, borderStyle: 'outset',borderWidth: 1}} fluid>
+      <Container style={{backgroundColor: 'AppWorkspace',width: '88%',marginTop: 20,borderRadius: 25, borderStyle: 'outset',borderWidth: 1}} fluid>
         
         <Row >
         <Col >
@@ -235,13 +250,13 @@ const Profile = () => {
             
             //setAvatar(profile.avatar)
             
-          }} style={{ width: '20%',height: 60,marginTop: 10, marginRight: 10}}>Clear picked avatar</Button>
+          }} style={{ width: '20%',height: 80,marginTop: 10, marginRight: 10}}>Clear picked avatar</Button>
           <Button variant='secondary' onClick={()=> {
             setAction("DEFAULT")
             
             
             
-          }} style={{ width: '20%',height: 60,marginTop: 10}}>Set default avatar</Button>
+          }} style={{ width: '20%',height: 80,marginTop: 10}}>Set default avatar</Button>
           </Row>
           
           <Row style={{marginTop: 20}}>
@@ -260,7 +275,7 @@ const Profile = () => {
           <Form.Label >Description: </Form.Label>
           <FormControl onChange={(e) => {
             setDescription(e.target.value)
-          }} style={{marginBottom: 10, marginRight: 10}} rows={5} maxLength={200} as={'textarea'} value={description}/>
+          }} style={isSmallerView ? {marginBottom: 10, marginRight: 10,width: 350} : {marginBottom: 10, marginRight: 10}} rows={5} maxLength={200} as={'textarea'} value={description}/>
           </Row>
           {
           (profile && (username !== profile.username || description !== profile.description || avatar instanceof Blob || (profile.avatar && avatar === '../user.png'))) &&

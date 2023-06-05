@@ -21,6 +21,7 @@ const Categories = () => {
   const [categoryDeleteDialog, setCategoryDeleteDialog] = useState(false)
   const [categoryToDelete,setCategoryToDelete] = useState(null)
   const [replacementCategoryItem, setReplacementCategoryItem] = useState({name: "^"})
+  const [isSmallerView, setSmallerView] = useState(false)
   const fetchCategories = async () => {
     setCategoriesLoading(true)
     const res = await HttpClient.GetCategories()
@@ -82,7 +83,21 @@ const Categories = () => {
   }
 
   useEffect(() => {
+    if(window.innerWidth <= 760)
+        setSmallerView(true)
+    const resizeSubscriber = window.addEventListener('resize', (e) => {
+        if(window.innerWidth <= 760)
+          setSmallerView(true)
+        else
+          setSmallerView(false)
+          console.log(window.innerWidth);
+      })
+
+
     fetchCategories()
+    return () => {
+      window.removeEventListener("resize",resizeSubscriber)
+  }
   },[])
 
   const queriedCategories = allCategories.filter((entry) => entry.name.includes(categoryName))
@@ -107,7 +122,7 @@ const Categories = () => {
               categoryAddingLoading ? 
               <Spinner size='large' style={{alignSelf: 'center'}} />
               :
-              <Button onClick={async () => {
+              <Button style={{marginTop: 3}} onClick={async () => {
                 await appendCategory()
               }} variant='success'>Append category</Button>
             }
@@ -156,6 +171,25 @@ const Categories = () => {
         {
           categoriesLoading ?
           <Row>Gathering items...</Row>
+          : 
+          isSmallerView ?
+          <Row>
+            <Col>
+              {queriedCategories.map((entry) => {
+                return (<Row key={entry._id}  style={{marginTop: 10, borderStyle: 'inset', borderWidth: 1,}}>
+                    <Row>Id: {entry._id}</Row>
+                    <Row>Name: {entry.name}</Row>
+                    <Row>Books count: {entry.books_count}</Row>
+                    <Row>
+                    <FiDelete onClick={() => {
+                      setCategoryToDelete(entry)
+                      setCategoryDeleteDialog(true)
+                    }} size={30} style={{cursor: 'pointer', color: 'red'}}></FiDelete>
+                    </Row>
+                </Row>)
+              })}
+            </Col>
+          </Row>
           :
           <Table>
           <thead>

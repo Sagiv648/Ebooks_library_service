@@ -207,7 +207,7 @@ const Root = () => {
   console.log("end root");
   return (
     <>
-    <Navbar style={isSmallerView ? {width: 1000} : {}} className='navbar-header' bg='light' expand="lg" onToggle={() => {
+    <Navbar className='navbar-header' bg='light' expand="lg" onToggle={() => {
       setCollapsed(!collapsed)
       
     }}>
@@ -218,7 +218,8 @@ const Root = () => {
           </Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls='basic-navbar-nav'/>
-          <Navbar.Collapse style={collapsed ? {backgroundColor: '#E9F7CA'}  :{} } id='basic-navbar-nav'>
+          
+          <Navbar.Collapse style={collapsed ? {position: 'sticky',backgroundColor: '#E9F7CA'}  : {} } id='basic-navbar-nav'>
           {
             profile ? (
               <Nav className='me-auto'>
@@ -231,16 +232,7 @@ const Root = () => {
                 privileged && <Nav.Item><Link className='nav-item' to={'console'}>Console</Link></Nav.Item>
               }
               
-              {/* <Nav.Item>
-                <Link className='nav-item' to={'uploads'}>Uploads</Link>
-                {
-                  uploads.filter((upload) => upload.finished == false).length > 0 &&
-                  (<Container style={{borderWidth: 1,backgroundColor: '#2596be', width: 50,textAlign: 'center',  borderRadius: 20, borderStyle: 'outset'}}>
-                    {uploads.filter((upload) => upload.finished == false).length}
-                  </Container>)
-                }
               
-              </Nav.Item> */}
               <Nav.Item onClick={() => {
                 logout();
                 
@@ -270,17 +262,24 @@ const Root = () => {
           </Navbar.Collapse>
           
              
-        {/* {
-        operationProgress && (<Navbar.Brand>{operationProgress}</Navbar.Brand>)
-        } */}
-          
+        
           
       </Container>
       
           
     </Navbar>
-      
-        <Outlet context={[]}/>
+         {/* {collapsed && 
+         <Row>
+          <Row><Link></Link></Row>
+          <Row>2</Row>
+          <Row>3</Row>
+          <Row>4</Row>
+          <Row>5</Row>
+          <Row>6</Row>
+          <Row>7</Row>
+          <Row>8</Row>
+          </Row>} */}
+        <Outlet />
       
       
     

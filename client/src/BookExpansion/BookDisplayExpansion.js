@@ -35,6 +35,7 @@ const BookDisplayExpansion = props => {
     const [permissions,setPermissions] = useState({})
     const [reportClicked, setReportClicked] = useState(false)
     const [expandedBook, setExpandedBook] = useState(location.state)
+    const [isSmallerView,setSmallerView] = useState(false)
     const reportBook = async () => {
 
         const res = await HttpClient.SubmitBookReport(expandedBook.book._id)
@@ -117,7 +118,20 @@ const BookDisplayExpansion = props => {
             
         if(!error)
             fetchReviews()
+            
+            if(window.innerWidth <= 760)
+            setSmallerView(true)
         
+            const resizeSubscriber = window.addEventListener('resize', (e) => {
+              if(window.innerWidth <= 760)
+                setSmallerView(true)
+              else
+                setSmallerView(false)
+                console.log(window.innerWidth);
+            })
+            return () => {
+              window.removeEventListener("resize",resizeSubscriber)
+            }
     },[])
 
 
@@ -138,13 +152,13 @@ const BookDisplayExpansion = props => {
                         <UserProfileModal setUserLinkClicked={setUserLinkClicked} user={expandedBook.book.user}/>
                     }
                     {/* Book details row */}
-                    <Row>
+                    <Row style={isSmallerView ? {flex: 1,alignItems: 'center', justifyContent: 'center'} : {}}>
                         <Col lg={2}>
                         <Row>
                             <img style={{width: 200, height: 200}} src={expandedBook.book.cover_image ? expandedBook.book.cover_image : "../default-cover.png"}/>
                             
                         </Row>
-                           <Button style={{ width: 100,marginTop: 5, marginBottom: 10,alignSelf: 'center'}} variant="success" onClick={(e) => {
+                           <Button style={{ width: 'auto',marginTop: 5, marginBottom: 10,alignSelf: 'center'}} variant="success" onClick={(e) => {
                                     window.open(expandedBook.book.download_url,expandedBook.book.name)
                                 }}>Download</Button>
                               
@@ -159,7 +173,7 @@ const BookDisplayExpansion = props => {
                             expandedBook.book.user.username &&
                             <>
                                 <Row>Uploaded by:  {expandedBook.book.user.username}</Row>
-                            <Row><Button style={{marginTop: 5}} onClick={() => {
+                            <Row><Button style={{marginTop: 5, width: 'auto'}} onClick={() => {
                                 setUserLinkClicked(true)
                             }}>Show profile</Button></Row>
                             </>
@@ -169,7 +183,7 @@ const BookDisplayExpansion = props => {
                         </Col>
                         <Col lg={8}>
                         <Container>
-                            <FormControl as={'textarea'} disabled rows={6} value={expandedBook.book.description}/>
+                            <FormControl style={isSmallerView ? {marginLeft: -20, marginTop: 5} : {}} as={'textarea'} disabled rows={6} value={expandedBook.book.description}/>
                             <Button onClick={async (e) => {
                         if(!reportClicked)
                         {
@@ -185,10 +199,10 @@ const BookDisplayExpansion = props => {
                     </Row>
                     {/* Insert a new review row */}
                     
-                    <Row>
+                    <Row style={isSmallerView ? {marginTop: 20, marginBottom: 10} : {}}>
                         <Col lg={10}>
                             <FormGroup>
-                            <FormControl  onChange={(e) => {
+                            <FormControl style={isSmallerView ? {marginBottom: 10} : {}}  onChange={(e) => {
                                 setReviewContent(e.target.value)
                             }} value={reviewContent} disabled={!auth ? true : permissions.review_ban ? true : false} type="text" as={'textarea'} placeholder="Review content..." maxLength={500} rows={4}/>
                             </FormGroup>

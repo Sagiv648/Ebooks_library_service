@@ -29,6 +29,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [topFiveDownloads,setTopFiveDownloads]=useState([])
   const [downloadedBook, setDownloadedBook] = useState("")
+  const [isSmallerView,setSmallerView] = useState(false)
  
   const fetchAllBooks = async () => {
     setIsLoading(true)
@@ -78,7 +79,19 @@ const fetchCategories = async () => {
   useEffect(() => {
     fetchAllBooks();
     fetchCategories()
-    
+    if(window.innerWidth <= 760)
+    setSmallerView(true)
+
+    const resizeSubscriber = window.addEventListener('resize', (e) => {
+      if(window.innerWidth <= 760)
+        setSmallerView(true)
+      else
+        setSmallerView(false)
+        console.log(window.innerWidth);
+    })
+    return () => {
+      window.removeEventListener("resize",resizeSubscriber)
+    }
     
 
   },[])
@@ -112,7 +125,7 @@ const fetchCategories = async () => {
     !exapnded ?
     search ?
     <Container>
-    <Button onClick={() => {
+    <Button style={{marginTop: 10, width: 'auto'}} onClick={() => {
             
             setSearch(false)
            }}>Clear</Button>
@@ -146,11 +159,11 @@ const fetchCategories = async () => {
       <Row>
         <Col>
         <FormLabel>Search by name:</FormLabel>
-        <FormControl value={name} style={{width: '60%'}} onChange={(e) => setName(e.target.value)} type='text'/></Col>
+        <FormControl value={name} style={{width: 'auto'}} onChange={(e) => setName(e.target.value)} type='text'/></Col>
         <Col>
         <FormLabel>Search by category:</FormLabel>
         <DropDown>
-            <DropDown.Toggle variant='info' style={{width: '60%'}}>{selectedCategory.name}</DropDown.Toggle>
+            <DropDown.Toggle variant='info' style={{width: 'auto'}}>{selectedCategory.name}</DropDown.Toggle>
               <DropDown.Menu>
                 {categories.length > 0 && categories.map((val,ind) => 
                 (<DropDown.Item onClick={(e) => setSelectedCategory(val)} key={ind}>{val.name}</DropDown.Item>))}
