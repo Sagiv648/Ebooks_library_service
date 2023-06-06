@@ -85,6 +85,8 @@ router.post('/signin', async (req,res) => {
                 id: exists._id,
                 username: exists.username,
                 downloaded_books: exists.downloaded_books,
+                uploaded_books: exists.uploaded_books,
+                uploaded_books_count : exists.uploaded_books_count,
                 description: exists.description},token: token})
         }
         else

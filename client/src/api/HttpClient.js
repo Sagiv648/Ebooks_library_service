@@ -255,7 +255,7 @@ class HttpClient{
 
             const storageItem = localStorage.getItem('profile')
             const item = JSON.parse(storageItem)
-            const filteredBooks = item.uploaded_books.filter((entry) => entry._id !== book._id)
+            const filteredBooks = item.uploaded_books.filter((entry) => entry !== book._id)
             item.uploaded_books_count = item.uploaded_books_count-1
             item.uploaded_books = filteredBooks
             localStorage.setItem('profile', JSON.stringify(item))
@@ -287,7 +287,7 @@ class HttpClient{
                 throw new Error(res.data.error)
             const localProfile = localStorage.getItem("profile")
             const parsedProfile = JSON.parse(localProfile)
-            console.log("data is");
+            
             console.log(res.data);
             parsedProfile.uploaded_books.push(res.data.book._id)
             parsedProfile.uploaded_books_count++;
