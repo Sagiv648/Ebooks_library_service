@@ -76,7 +76,7 @@ const Profile = () => {
     if(avatar instanceof Blob )
     {
       const file_name = crypto.SHA256(`${profile.id}`)
-      //console.log("it's a blob");
+     
       const mime = avatar.name.split('.').slice(-1)
       const image = await StorageClient.Upload(avatar, "avatars", `${file_name}.${mime}`)
       //profile.avatar = await StorageClient.UploadAvatar({avatar: avatar, id: profile.id})
@@ -88,9 +88,7 @@ const Profile = () => {
       //console.log(image);
       
       data.avatar = image.download_url
-      //setAvatar(image.download_url)
-      //setNewAvatar(null)
-      //console.log(profile.avatar);
+     
     }
     else
       data.avatar = ""
@@ -104,29 +102,16 @@ const Profile = () => {
     .then((newProfile) => {
       console.log("xyz");
       toast.success("Profile successfully updated.")
-      //fetchProfile()
+      
       setProfile(newProfile)
       setAvatar(newProfile.avatar)
-      //setFileUrl(URL.revokeObjectURL(fileUrl))
-      //setAction("CLEAR")
+      
     })
     .catch((err) => {
       toast.error(`Error occured`)
     })
     
-    //const newProfile = await HttpClient.EditProfile(data)
-    // if(newProfile instanceof Error)
-    // {
-    //   toast.error(`Error occured`)
-    // }
-    // else
-    // {
-    //   toast.success("Profile successfully updated.")
-    //   setProfile(newProfile)
-  
-    //   setNewAvatar("")
-    // }
-    //const picture = await StorageClient.UploadAvatar()
+    
   }
 
 
@@ -154,6 +139,7 @@ const Profile = () => {
   useEffect(() => {
     switch (action) {
       case "CLEAR":
+        
         //URL.revokeObjectURL(fileUrl)
         setFileUrl(URL.revokeObjectURL(fileUrl))
         if(profile.avatar)
@@ -188,7 +174,7 @@ const Profile = () => {
                 {uploadedBooks.length != 0 ? uploadedBooks.map((book,ind) => {
 
                   return (<Accordion.Item style={{alignItems: 'center'}} key={book._id} eventKey={ind}>
-                    <BookEntry uploadedBooks={uploadedBooks} setUploadedBooks={setUploadedBooks}  itemToDelete={itemToDelete} setItemToDelete={setItemToDelete} book={book}/>
+                    <BookEntry uploadedBooks={uploadedBooks} setUploadedBooks={setUploadedBooks} itemToDelete={itemToDelete} setItemToDelete={setItemToDelete} book={book}/>
                     
                   </Accordion.Item>)
                 })

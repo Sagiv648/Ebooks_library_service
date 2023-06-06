@@ -218,7 +218,63 @@ const Root = () => {
           </Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls='basic-navbar-nav'/>
-          
+          {
+            
+             isSmallerView && collapsed &&
+            <Navbar.Collapse style={collapsed ? {position: 'sticky',backgroundColor: '#E9F7CA'}  : {} } id='basic-navbar-nav'/>
+            
+
+          }
+
+          {
+            !isSmallerView &&
+            profile ?
+            <Nav className='me-auto'>
+            
+              <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
+              
+              <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
+              <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
+              {
+                privileged && <Nav.Item><Link className='nav-item' to={'console'}>Console</Link></Nav.Item>
+              }
+              
+              
+              <Nav.Item onClick={() => {
+                logout();
+                
+              }}><Link className='nav-item'>Logout</Link></Nav.Item>
+            </Nav>
+            : !isSmallerView && !profile &&
+            <Nav className='me-auto'>
+            
+            <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
+            <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
+            <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
+            <Nav.Item> <Link className='nav-item' to={"auth"}>Sign in</Link></Nav.Item>
+            
+          </Nav>
+          }
+
+          {/* {
+            profile && !isSmallerView &&
+            <Nav className='me-auto'>
+            
+              <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
+              
+              <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
+              <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
+              {
+                privileged && <Nav.Item><Link className='nav-item' to={'console'}>Console</Link></Nav.Item>
+              }
+              
+              
+              <Nav.Item onClick={() => {
+                logout();
+                
+              }}><Link className='nav-item'>Logout</Link></Nav.Item>
+            </Nav>
+          }
           <Navbar.Collapse style={collapsed ? {position: 'sticky',backgroundColor: '#E9F7CA'}  : {} } id='basic-navbar-nav'>
           {
             profile ? (
@@ -249,36 +305,67 @@ const Root = () => {
               
             </Nav>
             )
-          }
+          } */}
+          
           {
-            profile ? <Navbar.Brand>Hello {profile.username ? profile.username : profile.email}</Navbar.Brand> : <Navbar.Brand>Guest</Navbar.Brand>
+            profile && !isSmallerView ? <Navbar.Brand>Hello {profile.username ? profile.username : profile.email}</Navbar.Brand> : !profile && !isSmallerView && <Navbar.Brand>Guest</Navbar.Brand>
           }
           
-          {/* {profile && <Navbar.Brand onClick={() => {
-              //setAvatarClicked(!avatarClicked)
-
-          }}><img className='avatar-img' src={ profile.avatar ? profile.avatar : "../user.png"}/></Navbar.Brand>} */}
           
-          </Navbar.Collapse>
+          {/* </Navbar.Collapse> */}
           
              
         
           
       </Container>
       
-          
+      {/* <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
+              
+              <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
+              <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
+              {
+                privileged && <Nav.Item><Link className='nav-item' to={'console'}>Console</Link></Nav.Item>
+              }
+              
+              
+              <Nav.Item onClick={() => {
+                logout();
+                
+              }}><Link className='nav-item'>Logout</Link></Nav.Item> */}
     </Navbar>
-         {/* {collapsed && 
-         <Row>
-          <Row><Link></Link></Row>
-          <Row>2</Row>
-          <Row>3</Row>
-          <Row>4</Row>
-          <Row>5</Row>
-          <Row>6</Row>
-          <Row>7</Row>
-          <Row>8</Row>
-          </Row>} */}
+         {collapsed && isSmallerView &&
+         <Row style={{backgroundColor: 'Highlight', borderRadius: 10,width: '50%' }}>
+          {
+            profile ?
+            <Container>
+            <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
+              
+              <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
+              <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
+              {
+                privileged && <Nav.Item><Link className='nav-item' to={'console'}>Console</Link></Nav.Item>
+              }
+              
+              
+              <Nav.Item onClick={() => {
+                logout();
+                
+              }}><Link className='nav-item'>Logout</Link></Nav.Item>
+            </Container>
+            
+          :
+          <Container>
+          <Nav.Item><Link className='nav-item' to={'/'}>Home</Link></Nav.Item>
+            <Nav.Item> <Link className='nav-item' to={"publish"}>Upload a book</Link></Nav.Item>
+            <Nav.Item><Link className='nav-item' to={"profile"}>Profile</Link></Nav.Item>
+            <Nav.Item> <Link className='nav-item' to={"auth"}>Sign in</Link></Nav.Item>
+        </Container>
+
+          }
+          {
+            profile ? <Navbar.Brand>Hello {profile.username ? profile.username : profile.email}</Navbar.Brand> :  <Navbar.Brand>Guest</Navbar.Brand>
+          }
+          </Row>}
         <Outlet />
       
       

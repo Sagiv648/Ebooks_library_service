@@ -60,8 +60,8 @@ const BookDisplayEntry = props => {
                     
                     <Col style={{height: 100}}><Button onClick={() => {
                         window.open(book.download_url, book.name)
-                        
-                        setDownloadedBook(book._id)
+                        if(setDownloadedBook)
+                            setDownloadedBook(book._id)
                     }} variant='success'>Download</Button>
                     {deleteAble &&
                         <Row style={{marginTop: 5}}>
